@@ -8,8 +8,23 @@ def read_data(fname):
         data.append((label, text))
     return data
 
+#Assure text is of even length, and starts and ends with _
+def normalize_text(text):
+    if len(text) % 2 == 0:
+        text = '_' + text + '_'
+    else:
+        text = '_' + text + '__'
+    return text
+
 def text_to_bigrams(text):
+    text = normalize_text(text)
     return ["%s%s" % (c1,c2) for c1,c2 in zip(text,text[1:])]
+
+def dataset_to_ids(dataset, F2I):
+    return [[l, [bigram_to_id(b, F2I) for b in blist]] for l,blist in iter(dataset)]
+
+def bigram_to_id(bigram, F2I):
+    return F2I[bigram] if F2I.has_key(bigram) else UNK_ID
 
 TRAIN = [(l,text_to_bigrams(t)) for l,t in read_data("../data/train")]
 DEV   = [(l,text_to_bigrams(t)) for l,t in read_data("../data/dev")]
@@ -27,3 +42,4 @@ L2I = {l:i for i,l in enumerate(list(sorted(set([l for l,t in TRAIN]))))}
 # feature strings (bigrams) to IDs
 F2I = {f:i for i,f in enumerate(list(sorted(vocab)))}
 
+UNK_ID = 600

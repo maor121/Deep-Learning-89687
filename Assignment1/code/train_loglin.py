@@ -1,5 +1,6 @@
 import loglinear as ll
 import random
+import numpy as np
 
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
@@ -7,7 +8,7 @@ STUDENT={'name': 'YOUR NAME',
 def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
-    return None
+    return np.histogram(features, bins=600)
 
 def accuracy_on_dataset(dataset, params):
     good = bad = 0.0
@@ -54,7 +55,12 @@ if __name__ == '__main__':
 
     #Load data on import
     import utils
-    #TODO: Continue
+    in_dim = len(utils.F2I) + 1
+    out_dim = len(utils.L2I)
+    train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I)
+    dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I)
+    num_iterations = 1000
+    learning_rate = 0.01
 
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
