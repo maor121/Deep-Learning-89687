@@ -51,9 +51,11 @@ if __name__ == '__main__':
     # YOUR CODE HERE
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
-    
-    # ...
-   
+
+    #Load data on import
+    import utils
+    #TODO: Continue
+
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
 
