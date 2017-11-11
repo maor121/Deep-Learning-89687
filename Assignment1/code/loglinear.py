@@ -53,7 +53,7 @@ def gradient_weight_out(H, Eo):
 
 # Define the gradient function for the bias parameters at the output layer
 def gradient_bias_out(Eo):
-    return  np.sum(Eo, axis=0, keepdims=True)
+    return Eo
 
 def loss_and_gradients(x, y, params):
     """
@@ -80,26 +80,6 @@ def loss_and_gradients(x, y, params):
     E0 = error_output(out, yOneHot)
     gW = gradient_weight_out(x, E0)
     gb = gradient_bias_out(E0)
-
-    """"#Compute gW
-    gW = np.ndarray(shape=W.shape)
-    featureCount = len(out)
-    yOneHot = np.zeros(featureCount)
-    yOneHot[y] = 1
-    out_signals = np.ndarray(len(out))
-    # 1. compute output node signals
-    for k in range(featureCount):
-        derivative = (1 - out[k]) * out[k]
-        out_signals[k] = derivative * (out[k] - yOneHot[k])
-    # 2. compute input-to-output weight gradients using output signals
-    for j in range(len(x)):
-        for k in range(featureCount):
-            gW[j, k] =  out_signals[k] * x[j]
-    # 3. compute output node bias gradients using output signals
-    #Compute gb
-    gb = np.ndarray(shape=b.shape)
-    for k in range(featureCount):
-        gb[k] = out_signals[k] * 1.0"""
 
     return loss,[gW,gb]
 
