@@ -69,12 +69,12 @@ def loss_and_gradients(x, y, params):
     """
     W,b = params
     # YOU CODE HERE
-    #Compute loss
     out = classifier_output(x,params=params)
-    loss = -np.log10(out[y])
-
     yOneHot = np.zeros(len(out), dtype=np.int32)
     yOneHot[y] = 1
+
+    #Compute loss
+    loss = cost(out, yOneHot)
 
     # Backpropagation
     E0 = error_output(out, yOneHot)
