@@ -15,6 +15,10 @@ def softmax(x):
     # With a vectorized implementation, the code should be no more than 2 lines.
     #
     # For numeric stability, use the identify you proved in Ex 2 Q1.
+    shiftx = x - np.max(x)
+    xExp = np.exp(shiftx)
+    x = xExp / np.sum(xExp)
+
     return x
     
 
@@ -25,6 +29,7 @@ def classifier_output(x, params):
     """
     W,b = params
     # YOUR CODE HERE.
+    probs = softmax(np.dot(x, W) + b)
     return probs
 
 def predict(x, params):
@@ -33,6 +38,22 @@ def predict(x, params):
     a log-linear classifier with given parameters on input x.
     """
     return np.argmax(classifier_output(x, params))
+
+# Define the cost function
+def cost(Y, T):
+    return - np.multiply(T, np.log(Y)).sum()
+
+# Define the error function at the output
+def error_output(Y, T):
+    return Y - T
+
+# Define the gradient function for the weight parameters at the output layer
+def gradient_weight_out(H, Eo):
+    return np.matrix(H).T * np.matrix(Eo)
+
+# Define the gradient function for the bias parameters at the output layer
+def gradient_bias_out(Eo):
+    return  np.sum(Eo, axis=0, keepdims=True)
 
 def loss_and_gradients(x, y, params):
     """
@@ -48,6 +69,38 @@ def loss_and_gradients(x, y, params):
     """
     W,b = params
     # YOU CODE HERE
+    #Compute loss
+    out = classifier_output(x,params=params)
+    loss = -np.log10(out[y])
+
+    yOneHot = np.zeros(len(out), dtype=np.int32)
+    yOneHot[y] = 1
+
+    # Backpropagation
+    E0 = error_output(out, yOneHot)
+    gW = gradient_weight_out(x, E0)
+    gb = gradient_bias_out(E0)
+
+    """"#Compute gW
+    gW = np.ndarray(shape=W.shape)
+    featureCount = len(out)
+    yOneHot = np.zeros(featureCount)
+    yOneHot[y] = 1
+    out_signals = np.ndarray(len(out))
+    # 1. compute output node signals
+    for k in range(featureCount):
+        derivative = (1 - out[k]) * out[k]
+        out_signals[k] = derivative * (out[k] - yOneHot[k])
+    # 2. compute input-to-output weight gradients using output signals
+    for j in range(len(x)):
+        for k in range(featureCount):
+            gW[j, k] =  out_signals[k] * x[j]
+    # 3. compute output node bias gradients using output signals
+    #Compute gb
+    gb = np.ndarray(shape=b.shape)
+    for k in range(featureCount):
+        gb[k] = out_signals[k] * 1.0"""
+
     return loss,[gW,gb]
 
 def create_classifier(in_dim, out_dim):
