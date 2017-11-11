@@ -69,6 +69,7 @@ def loss_and_gradients(x, y, params):
     """
     W,b = params
     # YOU CODE HERE
+    #Largely based on http://peterroelants.github.io/posts/neural_network_implementation_part04/
     out = classifier_output(x,params=params)
     yOneHot = np.zeros(len(out), dtype=np.int32)
     yOneHot[y] = 1
