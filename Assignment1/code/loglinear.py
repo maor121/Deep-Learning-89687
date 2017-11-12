@@ -41,6 +41,7 @@ def predict(x, params):
 
 # Define the cost function
 def cost(Y, T):
+    Y = np.maximum(Y, 1e-15) #numerical stability, do not allow 0
     return - np.multiply(T, np.log(Y)).sum()
 
 # Define the error function at the output

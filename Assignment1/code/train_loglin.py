@@ -8,7 +8,7 @@ STUDENT={'name': 'YOUR NAME',
 def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
-    return np.histogram(features, bins=600)
+    return np.histogram(features, bins=601, range=(-1,600))[0]
 
 def accuracy_on_dataset(dataset, params):
     good = bad = 0.0
@@ -17,7 +17,12 @@ def accuracy_on_dataset(dataset, params):
         # Compute the accuracy (a scalar) of the current parameters
         # on the dataset.
         # accuracy is (correct_predictions / all_predictions)
-        pass
+        x = feats_to_vec(features)
+        prediction = ll.predict(x, params)
+        if prediction == label:
+            good += 1
+        else:
+            bad += 1
     return good / (good + bad)
 
 def train_classifier(train_data, dev_data, num_iterations, learning_rate, params):
@@ -41,6 +46,11 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
             # YOUR CODE HERE
             # update the parameters according to the gradients
             # and the learning rate.
+            W,b = params
+            np.add(W, learning_rate*grads[0], out=W)
+            np.add(b, learning_rate*grads[1], out=b)
+            #W = W + learning_rate*grads[0]
+            #b = b + learning_rate*grads[1]
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -57,8 +67,8 @@ if __name__ == '__main__':
     import utils
     in_dim = len(utils.F2I) + 1
     out_dim = len(utils.L2I)
-    train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I)
-    dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I)
+    train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I, utils.L2I)
+    dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I, utils.L2I)
     num_iterations = 1000
     learning_rate = 0.01
 

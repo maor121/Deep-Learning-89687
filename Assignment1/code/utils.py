@@ -20,8 +20,8 @@ def text_to_bigrams(text):
     text = normalize_text(text)
     return ["%s%s" % (c1,c2) for c1,c2 in zip(text,text[1:])]
 
-def dataset_to_ids(dataset, F2I):
-    return [[l, [bigram_to_id(b, F2I) for b in blist]] for l,blist in iter(dataset)]
+def dataset_to_ids(dataset, F2I, L2I):
+    return [[L2I[l], [bigram_to_id(b, F2I) for b in blist]] for l,blist in iter(dataset)]
 
 def bigram_to_id(bigram, F2I):
     return F2I[bigram] if F2I.has_key(bigram) else UNK_ID
