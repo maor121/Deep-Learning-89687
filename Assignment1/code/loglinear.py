@@ -49,8 +49,8 @@ def error_output(Y, T):
     return Y - T
 
 # Define the gradient function for the weight parameters at the output layer
-def gradient_weight_out(H, Eo):
-    result = np.matrix(H).T * np.matrix(Eo)
+def gradient_weight_out(X, Eo):
+    result = np.dot(np.matrix(X).T , np.matrix(Eo))
     return np.squeeze(np.asarray(result)) #Convert matrix to 2d-ndarray
 
 # Define the gradient function for the bias parameters at the output layer
