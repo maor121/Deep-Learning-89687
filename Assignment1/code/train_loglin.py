@@ -49,8 +49,8 @@ def train_classifier(train_data, dev_data, num_iterations, learning_rate, params
             W,b = params
             np.add(W, learning_rate*grads[0], out=W)
             np.add(b, learning_rate*grads[1], out=b)
-            #W = W + learning_rate*grads[0]
-            #b = b + learning_rate*grads[1]
+            #params[0] = W + learning_rate*grads[0]
+            #params[1] = b + learning_rate*grads[1]
 
         train_loss = cum_loss / len(train_data)
         train_accuracy = accuracy_on_dataset(train_data, params)
@@ -70,7 +70,7 @@ if __name__ == '__main__':
     train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I, utils.L2I)
     dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I, utils.L2I)
     num_iterations = 1000
-    learning_rate = 0.01
+    learning_rate = 0.1
 
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
