@@ -16,14 +16,14 @@ def predict(x, params):
 def loss_and_gradients(x, y, params):
     # YOU CODE HERE
 
-    out = predict(x, params)
+    out = classifier_output(x, params)
     yOneHot = np.zeros(len(out))
     yOneHot[y] = 1
 
     loss = cost(out, yOneHot)
 
     W, b = params
-    H = hidden_activations(x, W[0], b[1])
+    H = hidden_activations(x, W[0], b[0])
 
     Eo = error_output(out, yOneHot)
     gWo = gradient_weight_out(H, Eo)
@@ -61,9 +61,13 @@ def softmax(x):
 
     return x
 
+# Define the logistic function
+def logistic(z):
+    return 1 / (1 + np.exp(-z))
+
 # Function to compute the hidden activations
 def hidden_activations(X, Wh, bh):
-    return np.tanh(X.dot(Wh) + bh)
+    return logistic(X.dot(Wh) + bh)
 
 # Define output layer feedforward
 def output_activations(H, Wo, bo):
@@ -83,7 +87,8 @@ def error_output(Y, T):
 
 # Define the gradient function for the weight parameters at the output layer
 def gradient_weight_out(H, Eo):
-    return  H.T.dot(Eo)
+    result = np.dot(np.matrix(H).T, np.matrix(Eo))
+    return np.squeeze(np.asarray(result))  # Convert matrix to 2d-ndarray
 
 # Define the gradient function for the bias parameters at the output layer
 def gradient_bias_out(Eo):
@@ -96,7 +101,8 @@ def error_hidden(H, Wo, Eo):
 
 # Define the gradient function for the weight parameters at the hidden layer
 def gradient_weight_hidden(X, Eh):
-    return X.T.dot(Eh)
+    result = np.dot(np.matrix(X).T, np.matrix(Eh))
+    return np.squeeze(np.asarray(result))  # Convert matrix to 2d-ndarray
 
 # Define the gradient function for the bias parameters at the output layer
 def gradient_bias_hidden(Eh):
