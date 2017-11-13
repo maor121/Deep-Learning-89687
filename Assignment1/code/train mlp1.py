@@ -72,8 +72,8 @@ if __name__ == '__main__':
     out_dim = len(utils.L2I)
     train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I, utils.L2I)
     dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I, utils.L2I)
-    num_iterations = 75
-    learning_rate = 0.5
+    num_iterations = 130
+    learning_rate = 0.01
 
     params = mlp1.create_classifier(in_dim, hid_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)

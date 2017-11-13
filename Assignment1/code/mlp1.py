@@ -107,3 +107,32 @@ def gradient_weight_hidden(X, Eh):
 # Define the gradient function for the bias parameters at the output layer
 def gradient_bias_hidden(Eh):
     return  Eh
+
+
+########################## Sanity #############################
+
+
+if __name__ == '__main__':
+
+    # Sanity checks. If these fail, your gradient calculation is definitely wrong.
+    # If they pass, it is likely, but not certainly, correct.
+    from grad_check import gradient_check
+
+    params = create_classifier(6, 4, 2)
+
+    def _loss_and_grad(x, params, i, j):
+        paramsClone = np.copy(params)
+        paramsClone[i][j] = x
+        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6]),0,paramsClone)
+        return loss,grads[i][j]
+
+    for _ in xrange(10):
+        Wh = np.random.uniform(0, 1, (6, 4))
+        bh = np.random.uniform(0, 1, 4)
+        Wo = np.random.uniform(0, 1, (4, 2))
+        bo = np.random.uniform(0, 1, 2)
+
+        gradient_check(lambda x: _loss_and_grad(x, params, 0, 1), Wo)
+        gradient_check(lambda x: _loss_and_grad(x, params, 1, 1), bo)
+        gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh)
+        gradient_check(lambda x : _loss_and_grad(x, params, 1, 0), bh)
