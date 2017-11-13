@@ -67,7 +67,7 @@ def logistic(z):
 
 # Function to compute the hidden activations
 def hidden_activations(X, Wh, bh):
-    return logistic(X.dot(Wh) + bh)
+    return np.tanh(X.dot(Wh) + bh)
 
 # Define output layer feedforward
 def output_activations(H, Wo, bo):
@@ -96,8 +96,8 @@ def gradient_bias_out(Eo):
 
 # Define the error function at the hidden layer
 def error_hidden(H, Wo, Eo):
-    # H * (1-H) * (E . Wo^T)
-    return np.multiply(np.multiply(H,(1 - H)), Eo.dot(Wo.T))
+    # (1-tanh^2(H) * (E . Wo^T)
+    return np.multiply(1 - np.tanh(H) ** 2, Eo.dot(Wo.T))
 
 # Define the gradient function for the weight parameters at the hidden layer
 def gradient_weight_hidden(X, Eh):
