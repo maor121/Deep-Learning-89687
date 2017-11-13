@@ -8,8 +8,9 @@ STUDENT={'name': 'YOUR NAME',
 def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
-    histogram = np.histogram(features, bins=600, range=(0,599))[0] #Drop UNK (id=600)
-    return histogram #/ float(len(features)) #normalize histogram by vector length
+    histogram = np.histogram(features, bins=600, range=(0,599))[0] # Drop UNK word (id=600)
+    normalized_histogram = histogram / float(len(features)) #normalize histogram by vector length
+    return normalized_histogram
 
 def accuracy_on_dataset(dataset, params):
     good = bad = 0.0
@@ -69,7 +70,7 @@ if __name__ == '__main__':
     train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I, utils.L2I)
     dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I, utils.L2I)
     num_iterations = 50
-    learning_rate = 0.01
+    learning_rate = 1
 
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
