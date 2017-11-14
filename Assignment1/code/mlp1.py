@@ -29,7 +29,8 @@ def loss_and_gradients(x, y, params):
     gWo = gradient_weight_out(H, Eo)
     gbo = gradient_bias_out(Eo)
 
-    Eh = error_hidden(H, W[1], Eo)
+    Zh = hidden_output(x, W[0], b[0])
+    Eh = error_hidden(Zh, W[1], Eo)
     gWh = gradient_weight_hidden(x, Eh)
     gbh = gradient_bias_hidden(Eh)
 
@@ -62,12 +63,12 @@ def softmax(x):
     return x
 
 # Define the logistic function
-def logistic(z):
-    return 1 / (1 + np.exp(-z))
+def hidden_output(X, Wh, bh):
+    return X.dot(Wh) + bh
 
 # Function to compute the hidden activations
 def hidden_activations(X, Wh, bh):
-    return np.tanh(X.dot(Wh) + bh)
+    return np.tanh(hidden_output(X, Wh, bh))
 
 # Define output layer feedforward
 def output_activations(H, Wo, bo):
