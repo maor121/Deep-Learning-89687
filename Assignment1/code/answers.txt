@@ -76,7 +76,8 @@ I tired several variations of this:
 1) Give the input "as is" - 300~500 iterations.
 2) Give histogram of the input (order of 1,0 does not matter), 330 iterations at most, sometimes as few as 140.
 
-An interesting article (http://hunch.net/?p=245) claims that XOR problems are hard for neural nets to learn.
+An interesting article (http://hunch.net/?p=245) claims that XOR problems are hard for neural nets to learn,
+maybe that is why it takes hundreds of epoches for such simple input.
 
 Results:
 144 0.418367677628 1.0 1.0  #Run 1
