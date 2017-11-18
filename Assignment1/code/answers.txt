@@ -14,7 +14,7 @@ This was done because when the weights in mlp1 were initialized as 0, they weigh
 This is because the weight gradient calculation in the last layer is hidden_output*error, and if the hidden layer output is zero,
 the weights gradient will remain 0.
 
-Secondly, with random initial weights, it seems mlp1 does not add extra accuracy on the dev set.
+Secondly, it seems mlp1 does not add extra accuracy on the dev set.
 The answer for this is pretty simple actually. If we train loglinear enough, we can achieve 100% accuracy on the train_set.
 Therefore, the loglinear has enough descriptive power to classify all the training set correctly. (It is overfitting actually)
 But by adding another layer, (and more descriptive power), we only increase the chances of overfitting. So the accuracy on the train_set
@@ -44,10 +44,10 @@ train_mlp1 (with zero initial weights) - does not converge.
 Q: Switch to unigrams, what is the result in loglinear model? mlp1?
 
 A: I added more epoches, and lowered the learning rate. But unigrams performed much worse than bigrams.
-mlp1 performed slightly better then loglinear, but the diff was so small is within error range, and not of any significance.
+mlp1 performed slightly better then loglinear, but the diff was so small it is within error range, and not of any significance.
 
 I believe it performed worse because bigrams hold more information then unigrams. Converting to unigrams looses all information
-of letters order. A loss of information the loglinear and mlp1 have trouble making up for.
+of letters order. A loss of information in the input is difficult making up for.
 
 That assumption is further supported in 3grams, in which I was able to get 0.9 accuracy on the dev set.
 I could not get this result with bigrams at all.
@@ -65,6 +65,5 @@ train mlp1 (with random initial weights):
 
 train mlp1 - 3grams (with random initial weights):
 79 0.0894954601435 0.997857754927 0.913333333333
-199 0.00352193946065 1.0 0.906666666667
 
 3)
