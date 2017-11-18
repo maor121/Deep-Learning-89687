@@ -79,4 +79,5 @@ I tired several variations of this:
 An interesting article (http://hunch.net/?p=245) claims that XOR problems are hard for neural nets to learn.
 
 Results:
-329 0.0273604662456 1.0 1.0
+144 0.418367677628 1.0 1.0  #Run 1
+329 0.0273604662456 1.0 1.0 #Run 2
