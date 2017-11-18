@@ -1,6 +1,7 @@
 import loglinear as ll
 import random
 import numpy as np
+import utils
 
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
@@ -8,7 +9,8 @@ STUDENT={'name': 'YOUR NAME',
 def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
-    histogram = np.histogram(features, bins=600, range=(0,599))[0] # Drop UNK word (id=600)
+    vocab_size = utils.VOCABOLARY_SIZE
+    histogram = np.histogram(features, bins=vocab_size, range=(0,vocab_size-1))[0] # Drop UNK word (id=600)
     normalized_histogram = histogram / float(len(features)) #normalize histogram by vector length
     return normalized_histogram
 
@@ -63,12 +65,12 @@ if __name__ == '__main__':
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
 
-    #Load data on import
-    import utils
-    in_dim = len(utils.F2I)
-    out_dim = len(utils.L2I)
-    train_data = utils.dataset_to_ids(utils.TRAIN, utils.F2I, utils.L2I)
-    dev_data = utils.dataset_to_ids(utils.DEV, utils.F2I, utils.L2I)
+    TRAIN, DEV, L2I, F2I = utils.read_dataset("../data/train", "../data/dev")
+
+    in_dim = len(F2I)
+    out_dim = len(L2I)
+    train_data = utils.dataset_to_ids(TRAIN, F2I, L2I)
+    dev_data = utils.dataset_to_ids(DEV, F2I, L2I)
     num_iterations = 50
     learning_rate = 1
 
