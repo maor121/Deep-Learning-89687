@@ -74,7 +74,7 @@ A: Around 140~330 iterations, with learning rate 0.08.
 
 I tired several variations of this:
 1) Give the input "as is" - 300~500 iterations.
-2) Give histogram of the input (order of 1,0 does not matter), 330 iterations at most.
+2) Give histogram of the input (order of 1,0 does not matter), 330 iterations at most, sometimes as few as 140.
 
 An interesting article (http://hunch.net/?p=245) claims that XOR problems are hard for neural nets to learn.
 
