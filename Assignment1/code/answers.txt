@@ -1,0 +1,40 @@
+Student Name:
+ID:
+
+Answers to questions:
+
+1)
+Q: Were you able to get better results with the multi-layer perceptron?
+
+A: No.
+
+Firstly, the mlp1 model was added another improvement, otherwise it won't converge.
+That improvement was to initialize the weights with random values. I did the grad_check for mlp1, so I believe the gradients are correct.
+The reason for this is that in both loglinear, and mlp1 with weights initialized as 0, they weights will remain zero forever!
+Only with a single layer (train_loglin), the bias vector is enough to classify well, but in two layers or more, it isn't.
+
+Secondly, with random initial weights, it seems mlp1 does not add extra accuracy on the dev set.
+The answer for this is pretty simple actually. If we train loglinear enough, we can achieve 100% accuracy on the train_set.
+Therefore, the loglinear has enough descriptive power to classify all the training set correctly. (It is overfitting actually)
+But by adding another layer, (and more descriptive power), we only increase the chances of overfitting. So the accuracy on the train_set
+remains the same, but on the dev set it deteriorates.
+
+I believe that if we added Dropout to mlp1, the result would improve. (Same for loglinear actually, but overfitting is worse in mlp1).
+
+Results:
+
+train_loglin (with zero initial weights):
+49 0.272165551876 0.945158526135 0.85           #Run 1
+49 0.271820111708 0.932305055698 0.87           #Run 2
+
+train_loglin (with random initial weights):
+49 0.272830683422 0.953727506427 0.856666666667 #Run 1
+49 0.267284910316 0.944730077121 0.856666666667 #Run 2
+
+train_mlp1 (with random initial weights):
+49 0.181911575221 0.959725792631 0.84           #Run 1
+49 0.188292561831 0.875321336761 0.8033         #Run 2
+49 0.195629323495 0.925449871465 0.8            #Run 3
+
+train_mlp1 (with zero initial weights) - does not converge.
+
