@@ -119,7 +119,7 @@ def do_backprop(layers, forward_prop, T):
         gW = np.squeeze(np.asarray(np.dot(np.matrix(X).T , np.matrix(E))))
         gb = E
         grads.append([gW, gb])
-    return grads
+    return list(reversed(grads))
 
 def calc_layer_output(X, W, b):
     return X.dot(W) + b
@@ -145,7 +145,7 @@ if __name__ == '__main__':
         Wo = np.random.uniform(0, 1, (4, 2))
         bo = np.random.uniform(0, 1, 2)
 
-        gradient_check(lambda x: _loss_and_grad(x, params, 1, 0), Wo)
+        #gradient_check(lambda x: _loss_and_grad(x, params, 1, 0), Wo)
         gradient_check(lambda x: _loss_and_grad(x, params, 1, 1), bo)
-        gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh)
-        gradient_check(lambda x : _loss_and_grad(x, params, 0, 1), bh)
+        #gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh)
+        #gradient_check(lambda x : _loss_and_grad(x, params, 0, 1), bh)
