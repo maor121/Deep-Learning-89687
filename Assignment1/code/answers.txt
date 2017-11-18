@@ -8,9 +8,9 @@ Q: Were you able to get better results with the multi-layer perceptron?
 
 A: No.
 
-Firstly, the mlp1 model was added another improvement, otherwise it won't converge.
+Firstly, the mlp1 model was added an improvement, otherwise it won't converge.
 The initialization of weights was done with random values, not zeros. I did the grad_check for mlp1, so I believe the gradients are correct.
-This was done because when the weights in mlp1 were initialized as 0, they weights will remain zero forever!
+This was done because when the weights in mlp1 were initialized as 0, the weights will remain zero forever!
 This is because the weight gradient calculation in the last layer is hidden_output*error, and if the hidden layer output is zero,
 the weights gradient will remain 0.
 
