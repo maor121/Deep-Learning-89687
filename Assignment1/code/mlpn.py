@@ -21,7 +21,9 @@ def loss_and_gradients(x, y, layers):
     calculations = do_forward_prop(x, layers)
     grads = do_backprop(layers, calculations, T)
 
-    return grads
+    loss = cost(calculations[-1][2], T)
+
+    return [loss, grads]
 
 def create_classifier(dims):
     """
@@ -64,6 +66,10 @@ def create_classifier(dims):
 
 ############################# Helper functions ##############################
 
+# Define the cost function
+def cost(Y, T):
+    return - np.multiply(T, np.log(Y)).sum()
+
 def softmax(x):
     shiftx = x - np.max(x)
     xExp = np.exp(shiftx)
@@ -97,8 +103,9 @@ def do_backprop(layers, forward_prop, T):
 
     grads = []
     E = None
+    gW = None
     prev_layer = None
-    for layer, calculation in (reversed(layers), reversed(forward_prop)):
+    for layer, calculation in zip(reversed(layers), reversed(forward_prop)):
         is_last = layer[2]
         if is_last:
             Y = calculation[2]
@@ -107,11 +114,38 @@ def do_backprop(layers, forward_prop, T):
         else:
             Z = calculation[1]
             W = prev_layer[0]
-            E = activation_deriative(Z) * (E * W.T)
+            E = np.multiply(activation_deriative(Z) , np.dot(E, W.T))
         X = calculation[0]
-        gW = X.T * E
-        gH = E
-        grads.append([gW, gH])
+        gW = np.squeeze(np.asarray(np.dot(np.matrix(X).T , np.matrix(E))))
+        gb = E
+        grads.append([gW, gb])
+    return grads
 
-def calc_layer_output(x, W, b):
-    return np.dot(x, W) + b
+def calc_layer_output(X, W, b):
+    return X.dot(W) + b
+
+
+if __name__ == '__main__':
+
+    # Sanity checks. If these fail, your gradient calculation is definitely wrong.
+    # If they pass, it is likely, but not certainly, correct.
+    from grad_check import gradient_check
+
+    params = create_classifier([6, 4, 2])
+
+    def _loss_and_grad(x, layers, layerIndex, i):
+        layersClone = np.copy(layers)
+        layersClone[layerIndex][i] = x
+        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6]),0,layersClone)
+        return loss,grads[layerIndex][i]
+
+    for _ in xrange(10):
+        Wh = np.random.uniform(0, 1, (6, 4))
+        bh = np.random.uniform(0, 1, 4)
+        Wo = np.random.uniform(0, 1, (4, 2))
+        bo = np.random.uniform(0, 1, 2)
+
+        gradient_check(lambda x: _loss_and_grad(x, params, 1, 0), Wo)
+        gradient_check(lambda x: _loss_and_grad(x, params, 1, 1), bo)
+        gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh)
+        gradient_check(lambda x : _loss_and_grad(x, params, 0, 1), bh)
