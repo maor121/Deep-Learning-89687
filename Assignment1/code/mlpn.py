@@ -3,23 +3,23 @@ import numpy as np
 STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
 
-def classifier_output(x, layers):
-    calculations = do_forward_prop(x, layers)
+def classifier_output(x, params):
+    calculations = do_forward_prop(x, params)
     probs = calculations[-1][2]
     return probs
 
 def predict(x, params):
     return np.argmax(classifier_output(x, params))
 
-def loss_and_gradients(x, y, layers):
+def loss_and_gradients(x, y, params):
 
-    num_labels = len(layers[-1][1])
+    num_labels = len(params[-1][1])
 
     T = np.zeros(num_labels)
     T[y] = 1
 
-    calculations = do_forward_prop(x, layers)
-    grads = do_backprop(layers, calculations, T)
+    calculations = do_forward_prop(x, params)
+    grads = do_backprop(params, calculations, T)
 
     loss = cost(calculations[-1][2], T)
 
