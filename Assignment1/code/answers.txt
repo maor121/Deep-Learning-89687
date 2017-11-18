@@ -67,3 +67,16 @@ train mlp1 - 3grams (with random initial weights):
 79 0.0894954601435 0.997857754927 0.913333333333
 
 3)
+
+Q: Apply mlp1 for XOR, how many iterations does it take?
+
+A: Around 140~330 iterations, with learning rate 0.08.
+
+I tired several variations of this:
+1) Give the input "as is" - 300~500 iterations.
+2) Give histogram of the input (order of 1,0 does not matter), 330 iterations at most.
+
+An interesting article (http://hunch.net/?p=245) claims that XOR problems are hard for neural nets to learn.
+
+Results:
+329 0.0273604662456 1.0 1.0
