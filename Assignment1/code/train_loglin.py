@@ -65,7 +65,7 @@ if __name__ == '__main__':
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
 
-    TRAIN, DEV, L2I, F2I = utils.read_dataset("../data/train", "../data/dev")
+    TRAIN, DEV, L2I, F2I = utils.read_dataset("../data/train", "../data/dev", ngrams=2)
 
     in_dim = len(F2I)
     out_dim = len(L2I)

@@ -4,10 +4,10 @@
 VOCABOLARY_SIZE = 600
 UNK_ID = VOCABOLARY_SIZE
 
-def read_dataset(train_set_path, dev_set_path):
+def read_dataset(train_set_path, dev_set_path, ngrams=2):
 
-    TRAIN = [(l,text_to_bigrams(t)) for l,t in read_data(train_set_path)]
-    DEV   = [(l,text_to_bigrams(t)) for l,t in read_data(dev_set_path)]
+    TRAIN = [(l,text_to_ngrams(t, ngrams)) for l,t in read_data(train_set_path)]
+    DEV   = [(l,text_to_ngrams(t, ngrams)) for l,t in read_data(dev_set_path)]
 
     from collections import Counter
     fc = Counter()
@@ -41,9 +41,11 @@ def normalize_text(text):
         text = '_' + text + '__'
     return text
 
-def text_to_bigrams(text):
+def text_to_ngrams(text, ngrams_count):
+    from itertools import izip, islice, tee
     text = normalize_text(text)
-    return ["%s%s" % (c1,c2) for c1,c2 in zip(text,text[1:])]
+    ngrams = izip(*(islice(seq, index, None) for index, seq in enumerate(tee(text,  ngrams_count))))
+    return list(ngrams)
 
 def dataset_to_ids(dataset, F2I, L2I):
     return [[L2I[l], [bigram_to_id(b, F2I) for b in blist]] for l,blist in iter(dataset)]
