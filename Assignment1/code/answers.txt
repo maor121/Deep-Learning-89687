@@ -40,3 +40,24 @@ train_mlp1 (with random initial weights):
 train_mlp1 (with zero initial weights) - does not converge.
 
 2)
+
+Q: Switch to unigrams, what is the result in loglinear model? mlp1?
+
+A: I added more epoches, and lowered the learning rate. But unigrams performed much worse than bigrams.
+mlp1 performed slightly better then bigrams, but the diff was so small is within error range, and not of any significance.
+
+I believe it performed worse because bigrams hold more information then unigrams. Converting to unigrams looses all information
+of letters order. A loss of information the loglinear and mlp1 have trouble making up for.
+
+Results:
+
+train loglin (with zero initial weights):
+199 0.973512681027 0.691516709512 0.61
+
+train loglin (with random initial weights):
+199 0.970887519862 0.686803770351 0.6
+
+train mlp1 (with random initial weights):
+199 0.843959306146 0.705655526992 0.64
+
+3)
