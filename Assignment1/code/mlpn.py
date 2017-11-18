@@ -110,7 +110,6 @@ def do_backprop(layers, forward_prop, T):
         if is_last:
             Y = calculation[2]
             E = softmax_deriative(Y, T)
-            prev_layer = layer
         else:
             Z = calculation[1]
             W = prev_layer[0]
@@ -119,6 +118,7 @@ def do_backprop(layers, forward_prop, T):
         gW = np.squeeze(np.asarray(np.dot(np.matrix(X).T , np.matrix(E))))
         gb = E
         grads.append([gW, gb])
+        prev_layer = layer
     return list(reversed(grads))
 
 def calc_layer_output(X, W, b):
