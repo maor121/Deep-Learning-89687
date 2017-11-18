@@ -131,21 +131,25 @@ if __name__ == '__main__':
     # If they pass, it is likely, but not certainly, correct.
     from grad_check import gradient_check
 
-    params = create_classifier([6, 4, 2])
+    params = create_classifier([8, 6, 4, 2])
 
     def _loss_and_grad(x, layers, layerIndex, i):
         layersClone = np.copy(layers)
         layersClone[layerIndex][i] = x
-        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6]),0,layersClone)
+        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6,7,8]),0,layersClone)
         return loss,grads[layerIndex][i]
 
     for _ in xrange(10):
-        Wh = np.random.uniform(0, 1, (6, 4))
-        bh = np.random.uniform(0, 1, 4)
+        Wh1 = np.random.uniform(0, 1, (8, 6))
+        bh1 = np.random.uniform(0, 1, 6)
+        Wh2 = np.random.uniform(0, 1, (6, 4))
+        bh2 = np.random.uniform(0, 1, 4)
         Wo = np.random.uniform(0, 1, (4, 2))
         bo = np.random.uniform(0, 1, 2)
 
-        #gradient_check(lambda x: _loss_and_grad(x, params, 1, 0), Wo)
-        gradient_check(lambda x: _loss_and_grad(x, params, 1, 1), bo)
-        #gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh)
-        #gradient_check(lambda x : _loss_and_grad(x, params, 0, 1), bh)
+        gradient_check(lambda x: _loss_and_grad(x, params, 2, 0), Wo)
+        gradient_check(lambda x: _loss_and_grad(x, params, 2, 1), bo)
+        gradient_check(lambda x : _loss_and_grad(x, params, 1, 0), Wh2)
+        gradient_check(lambda x : _loss_and_grad(x, params, 1, 1), bh2)
+        gradient_check(lambda x : _loss_and_grad(x, params, 0, 0), Wh1)
+        gradient_check(lambda x : _loss_and_grad(x, params, 0, 1), bh1)
