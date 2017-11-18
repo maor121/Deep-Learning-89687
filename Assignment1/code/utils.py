@@ -1,10 +1,9 @@
 # This file provides code which you may or may not find helpful.
 # Use it if you want, or ignore it.
 
-VOCABOLARY_SIZE = 600
-UNK_ID = VOCABOLARY_SIZE
+UNK_ID = -1
 
-def read_dataset(train_set_path, dev_set_path, ngrams=2):
+def read_dataset(train_set_path, dev_set_path, ngrams=2, vocab_size=600):
 
     TRAIN = [(l,text_to_ngrams(t, ngrams)) for l,t in read_data(train_set_path)]
     DEV   = [(l,text_to_ngrams(t, ngrams)) for l,t in read_data(dev_set_path)]
@@ -15,7 +14,7 @@ def read_dataset(train_set_path, dev_set_path, ngrams=2):
         fc.update(feats)
 
     # 600 most common bigrams in the training set.
-    vocab = set([x for x,c in fc.most_common(VOCABOLARY_SIZE)])
+    vocab = set([x for x,c in fc.most_common(vocab_size)])
 
     # label strings to IDs
     L2I = {l:i for i,l in enumerate(list(sorted(set([l for l,t in TRAIN]))))}
@@ -34,22 +33,22 @@ def read_data(fname):
     return data
 
 #Assure text is of even length, and starts and ends with _
-def normalize_text(text):
-    if len(text) % 2 == 0:
-        text = '_' + text + '_'
-    else:
-        text = '_' + text + '__'
+def normalize_text(text, ngrams_count):
+    wrap = "_"*(ngrams_count-1)
+    text = wrap + text + wrap
+    if len(text) % ngrams_count != 0:
+        text += "_"*(len(text)%ngrams_count)
     return text
 
 def text_to_ngrams(text, ngrams_count):
     from itertools import izip, islice, tee
-    text = normalize_text(text)
+    text = normalize_text(text, ngrams_count)
     ngrams = izip(*(islice(seq, index, None) for index, seq in enumerate(tee(text,  ngrams_count))))
     return list(ngrams)
 
 def dataset_to_ids(dataset, F2I, L2I):
-    return [[L2I[l], [bigram_to_id(b, F2I) for b in blist]] for l,blist in iter(dataset)]
+    return [[L2I[l], [ngram_to_id(b, F2I) for b in blist]] for l, blist in iter(dataset)]
 
-def bigram_to_id(bigram, F2I):
+def ngram_to_id(bigram, F2I):
     return F2I[bigram] if F2I.has_key(bigram) else UNK_ID
 

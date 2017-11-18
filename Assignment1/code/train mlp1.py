@@ -3,11 +3,12 @@ import random
 import numpy as np
 import utils
 
+global VOCABOLARY_SIZE
+
 def feats_to_vec(features):
     # YOUR CODE HERE.
     # Should return a numpy vector of features.
-    vocab_size = utils.VOCABOLARY_SIZE
-    histogram = np.histogram(features, bins=vocab_size, range=(0,vocab_size-1))[0] # Drop UNK word (id=600)
+    histogram = np.histogram(features, bins=VOCABOLARY_SIZE, range=(0,VOCABOLARY_SIZE-1))[0] # Drop UNK word (id=600)
     normalized_histogram = histogram / float(len(features)) #normalize histogram by vector length
     return normalized_histogram
 
@@ -67,7 +68,10 @@ if __name__ == '__main__':
     # write code to load the train and dev sets, set up whatever you need,
     # and call train_classifier.
 
-    TRAIN, DEV, L2I, F2I = utils.read_dataset("../data/train", "../data/dev", ngrams=2)
+    VOCABOLARY_SIZE = 600
+    NGRAMS = 2
+    TRAIN, DEV, L2I, F2I = utils.read_dataset("../data/train", "../data/dev", ngrams=NGRAMS, vocab_size=VOCABOLARY_SIZE)
+
     in_dim = len(F2I)
     hid_dim = 32
     out_dim = len(L2I)
