@@ -56,8 +56,8 @@ def create_classifier(dims):
     while True:
         try:
             nextDim = dimsIter.next()
-            W = np.random.uniform(0,1, (lastDim, nextDim))
-            b = np.random.uniform(0,1, nextDim)
+            W = np.random.uniform(-1,1, (lastDim, nextDim))
+            b = np.random.uniform(-1,1, nextDim)
             params += [W, b]
 
             lastDim = nextDim
@@ -155,12 +155,12 @@ if __name__ == '__main__':
         return loss,grads[layerIndex*2 + i]
 
     for _ in xrange(10):
-        Wh1 = np.random.uniform(0, 1, (8, 6))
-        bh1 = np.random.uniform(0, 1, 6)
-        Wh2 = np.random.uniform(0, 1, (6, 4))
-        bh2 = np.random.uniform(0, 1, 4)
-        Wo = np.random.uniform(0, 1, (4, 2))
-        bo = np.random.uniform(0, 1, 2)
+        Wh1 = np.random.uniform(-1, 1, (8, 6))
+        bh1 = np.random.uniform(-1, 1, 6)
+        Wh2 = np.random.uniform(-1, 1, (6, 4))
+        bh2 = np.random.uniform(-1, 1, 4)
+        Wo = np.random.uniform(-1, 1, (4, 2))
+        bo = np.random.uniform(-1, 1, 2)
 
         gradient_check(lambda x: _loss_and_grad(x, params, 2, 0), Wo)
         gradient_check(lambda x: _loss_and_grad(x, params, 2, 1), bo)
