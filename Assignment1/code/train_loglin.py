@@ -80,3 +80,12 @@ if __name__ == '__main__':
     params = ll.create_classifier(in_dim, out_dim)
     trained_params = train_classifier(train_data, dev_data, num_iterations, learning_rate, params)
 
+    """
+    I2L = {v: k for k, v in L2I.iteritems()}
+
+    TEST = [(l, utils.text_to_ngrams(t, NGRAMS)) for l, t in utils.read_data("../data/test")]
+
+    test_data = [[[utils.ngram_to_id(b, F2I) for b in blist]] for l, blist in iter(TEST)]
+    for features in test_data:
+        print(I2L[ll.predict(feats_to_vec(features), trained_params)])
+    """
