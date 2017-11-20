@@ -10,8 +10,7 @@ def classifier_output(x, params):
     return probs
 
 def predict(x, params):
-    layers = convert_params_to_layers(params)
-    return np.argmax(classifier_output(x, layers))
+    return np.argmax(classifier_output(x, params))
 
 def loss_and_gradients(x, y, params):
 
@@ -120,7 +119,6 @@ def do_backprop(layers, forward_prop, T):
 
     grads = []
     E = None
-    gW = None
     prev_layer = None
     for layer, calculation in zip(reversed(layers), reversed(forward_prop)):
         is_last = layer[2]
