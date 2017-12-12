@@ -4,7 +4,8 @@ STUDENT={'name': 'YOUR NAME',
          'ID': 'YOUR ID NUMBER'}
 
 def classifier_output(x, params):
-    calculations = do_forward_prop(x, params)
+    layers = convert_params_to_layers(params)
+    calculations = do_forward_prop(x, layers)
     probs = calculations[-1][2]
     return probs
 
@@ -13,13 +14,15 @@ def predict(x, params):
 
 def loss_and_gradients(x, y, params):
 
-    num_labels = len(params[-1][1])
+    layers = convert_params_to_layers(params)
+
+    num_labels = len(layers[-1][1])
 
     T = np.zeros(num_labels)
     T[y] = 1
 
-    calculations = do_forward_prop(x, params)
-    grads = do_backprop(params, calculations, T)
+    calculations = do_forward_prop(x, layers)
+    grads = do_backprop(layers, calculations, T)
 
     loss = cost(calculations[-1][2], T)
 
@@ -53,18 +56,31 @@ def create_classifier(dims):
     while True:
         try:
             nextDim = dimsIter.next()
-            W = np.random.uniform(0,1, (lastDim, nextDim))
-            b = np.random.uniform(0,1, nextDim)
-            params.append((W,b, False))
+            W = np.random.uniform(-1,1, (lastDim, nextDim))
+            b = np.random.uniform(-1,1, nextDim)
+            params += [W, b]
 
             lastDim = nextDim
         except StopIteration:
-            lastLayer = params[-1]
-            params[-1] = (lastLayer[0], lastLayer[1], True)
             break
     return params
 
 ############################# Helper functions ##############################
+
+def pairs(iterable):
+    "s -> (s0,s1), (s2,s3), (s4, s5), ..."
+    from itertools import izip
+    itr = iter(iterable)
+    return izip(itr, itr)
+
+def convert_params_to_layers(params):
+    """Return a list of tuples [(W,b, is_last_layer: bool)...]"""
+    layers = []
+    for W, b in pairs(params):
+        layers.append((W,b,False))
+    last_layer = layers[-1]
+    layers[-1] = (last_layer[0], last_layer[1], True)
+    return layers
 
 # Define the cost function
 def cost(Y, T):
@@ -103,7 +119,6 @@ def do_backprop(layers, forward_prop, T):
 
     grads = []
     E = None
-    gW = None
     prev_layer = None
     for layer, calculation in zip(reversed(layers), reversed(forward_prop)):
         is_last = layer[2]
@@ -117,9 +132,9 @@ def do_backprop(layers, forward_prop, T):
         X = calculation[0]
         gW = np.squeeze(np.asarray(np.dot(np.matrix(X).T , np.matrix(E))))
         gb = E
-        grads.append([gW, gb])
+        grads = [gW, gb] + grads
         prev_layer = layer
-    return list(reversed(grads))
+    return grads
 
 def calc_layer_output(X, W, b):
     return X.dot(W) + b
@@ -133,19 +148,19 @@ if __name__ == '__main__':
 
     params = create_classifier([8, 6, 4, 2])
 
-    def _loss_and_grad(x, layers, layerIndex, i):
-        layersClone = np.copy(layers)
-        layersClone[layerIndex][i] = x
-        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6,7,8]),0,layersClone)
-        return loss,grads[layerIndex][i]
+    def _loss_and_grad(x, params, layerIndex, i):
+        paramsClone = np.copy(params)
+        paramsClone[layerIndex*2 + i] = x
+        loss,grads = loss_and_gradients(np.array([1,2,3,4,5,6,7,8]),0,paramsClone)
+        return loss,grads[layerIndex*2 + i]
 
     for _ in xrange(10):
-        Wh1 = np.random.uniform(0, 1, (8, 6))
-        bh1 = np.random.uniform(0, 1, 6)
-        Wh2 = np.random.uniform(0, 1, (6, 4))
-        bh2 = np.random.uniform(0, 1, 4)
-        Wo = np.random.uniform(0, 1, (4, 2))
-        bo = np.random.uniform(0, 1, 2)
+        Wh1 = np.random.uniform(-1, 1, (8, 6))
+        bh1 = np.random.uniform(-1, 1, 6)
+        Wh2 = np.random.uniform(-1, 1, (6, 4))
+        bh2 = np.random.uniform(-1, 1, 4)
+        Wo = np.random.uniform(-1, 1, (4, 2))
+        bo = np.random.uniform(-1, 1, 2)
 
         gradient_check(lambda x: _loss_and_grad(x, params, 2, 0), Wo)
         gradient_check(lambda x: _loss_and_grad(x, params, 2, 1), bo)
