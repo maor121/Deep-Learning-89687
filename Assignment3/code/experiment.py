@@ -11,7 +11,7 @@ class LSTMTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size):
         super(LSTMTagger, self).__init__()
-        target_size = 1
+        target_size = 2
 
         self.hidden_dim = hidden_dim
 
@@ -23,22 +23,21 @@ class LSTMTagger(nn.Module):
 
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, target_size)
-        self.hidden = self.init_hidden()
 
     def init_hidden(self):
         # Before we've done anything, we dont have any hidden state.
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (autograd.Variable(torch.zeros(1, 1, self.hidden_dim)),
+        self.hidden = (autograd.Variable(torch.zeros(1, 1, self.hidden_dim)),
                 autograd.Variable(torch.zeros(1, 1, self.hidden_dim)))
 
     def forward(self, sentence):
         embeds = self.word_embeddings(sentence)
         lstm_out, self.hidden = self.lstm(
-            embeds.view(len(sentence), -1), self.hidden)
+            embeds.view(len(sentence), 1, -1), self.hidden)
         out = self.hidden2tag(lstm_out.view(len(sentence), -1))
-        return out[-1]
+        return torch.unsqueeze(out[-1],0)
 
 
 class ModelRunner:
@@ -52,7 +51,7 @@ class ModelRunner:
             # cudnn.benchmark = True
             net.cuda()
 
-        self.criterion = nn.BCEWithLogitsLoss()
+        self.criterion = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
         self.net = net
     def train(self, trainloader, epoches):
@@ -68,14 +67,14 @@ class ModelRunner:
                 inputs, labels = data
 
                 # wrap them in Variable
-                inputs, labels = Variable(inputs, requires_grad=False), Variable(labels, requires_grad=False)
+                inputs, labels = Variable(inputs), Variable(labels)
 
                 if self.is_cuda:
                     inputs, labels = inputs.cuda(), labels.cuda()
 
                 # zero the parameter gradients
-                self.optimizer.zero_grad()
                 self.net.init_hidden()
+                self.optimizer.zero_grad()
 
                 # forward + backward + optimize
                 outputs = self.net(inputs)
@@ -115,7 +114,7 @@ def randomTrainingExample(C2I, ex_max_len):
     from gen_examples import gen_example
     example, is_positive = gen_example(ex_max_len)
     input_tensor = torch.LongTensor([C2I[c] for c in example])
-    category_tensor = torch.FloatTensor([is_positive])
+    category_tensor = torch.LongTensor([is_positive])
 
     #return torch.unsqueeze(input_tensor, 0), torch.unsqueeze(category_tensor, 0)
     return input_tensor, category_tensor
