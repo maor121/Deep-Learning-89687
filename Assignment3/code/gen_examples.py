@@ -1,8 +1,8 @@
 """Usage: gen_examples.py [-p number] [-n number] [-l number] [OUT_POSITIVE_FILE] [OUT_NEGATIVE_FILE]
 
 -h --help    show this
--p number    number of positive examples to generate [default: 1]
--n number    number of negative examples to generate [default: 1]
+-p number    number of positive examples to generate [default: 500]
+-n number    number of negative examples to generate [default: 500]
 -l number    max length per example [default: 1000]
 
 """
@@ -53,5 +53,11 @@ if __name__ == '__main__':
     n_count = int(arguments['-n'])
     ex_max_len = int(arguments['-l'])
 
-    print(generate_string(True, 9))
-    print(generate_string(False, 9))
+    with open(out_positive_filename, "w+") as pos_file,\
+        open(out_negative_filename, "w+") as neg_file:
+        for i in range(p_count):
+            pos_file.write(generate_string(True, ex_max_len)+"\n")
+        for i in range(n_count):
+            neg_file.write(generate_string(True, ex_max_len) + "\n")
+
+    print("Done")
