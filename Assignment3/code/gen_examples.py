@@ -44,6 +44,10 @@ def generate_string(is_positive, limit):
 
     return ''.join(sub_strs)
 
+def gen_example(ex_max_len):
+    isPos = random.uniform(0,1) < 0.5
+    return generate_string(isPos, ex_max_len), isPos
+
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='Naval Fate 2.0')
