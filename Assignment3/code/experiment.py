@@ -97,7 +97,7 @@ class ModelRunner:
         self.net.train(False)  # Disable dropout during eval mode
         correct = 0
         total = 0
-        for data in testloader:
+        for i, data in enumerate(testloader):
             features, labels = data
             input = Variable(features, volatile=True)
             if self.is_cuda:
@@ -106,6 +106,8 @@ class ModelRunner:
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum()
+            if i % 10 == 0 and i > 0:
+                print("evaluated: "+str(i))
         print('Accuracy of the network on the %d test words: %d %%' % (
             total, 100 * correct / total))
 
@@ -122,6 +124,7 @@ def randomTrainingExample(C2I, ex_max_len):
 class Generator(object):
     def __init__(self, len, C2I, ex_max_len):
         self._len = len
+        self.current = 0
         self._C2I = C2I
         self._ex_max_len = ex_max_len
 
@@ -132,6 +135,9 @@ class Generator(object):
         return self._len
 
     def __next__(self):
+        self.current += 1
+        if self.current >= self.__len__():
+            raise StopIteration
         return randomTrainingExample(self._C2I, self._ex_max_len)
 
     next = __next__  # Python 2 compatibility
@@ -140,8 +146,8 @@ if __name__ == '__main__':
     import torch.utils.data
 
     is_cuda = False
-    embedding_dim = 6
-    hidden_dim = 6
+    embedding_dim = 50
+    hidden_dim = 20
     learning_rate = 0.001
     batch_size = 1
     epoches = 1
