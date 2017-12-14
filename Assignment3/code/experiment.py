@@ -122,11 +122,12 @@ def randomTrainingExample(C2I, ex_max_len):
     return input_tensor, category_tensor
 
 class Generator(object):
-    def __init__(self, len, C2I, ex_max_len):
+    def __init__(self, len, C2I, ex_max_len, generateFunction):
         self._len = len
         self.current = 0
         self._C2I = C2I
         self._ex_max_len = ex_max_len
+        self._gen_func = generateFunction
 
     def __iter__(self):
         return self
@@ -138,9 +139,10 @@ class Generator(object):
         self.current += 1
         if self.current >= self.__len__():
             raise StopIteration
-        return randomTrainingExample(self._C2I, self._ex_max_len)
+        return self._gen_func(self._C2I, self._ex_max_len)
 
     next = __next__  # Python 2 compatibility
+
 
 if __name__ == '__main__':
     import torch.utils.data
@@ -159,8 +161,8 @@ if __name__ == '__main__':
         C2I[c] = len(C2I)
 
 
-    trainloader = Generator(1500, C2I, 200)
-    testloader = Generator(200, C2I, 10000)
+    trainloader = Generator(1500, C2I, 200, randomTrainingExample)
+    testloader = Generator(200, C2I, 10000, randomTrainingExample)
 
     runner = ModelRunner(learning_rate, is_cuda)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
