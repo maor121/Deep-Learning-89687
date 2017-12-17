@@ -57,7 +57,7 @@ if __name__ == '__main__':
     res = [1 for s,is_pos in [randomTrainingExample2(C2I, 200) for i in range(1000)] if is_pos[0]==1]
     print("pos/neg: {}/{}".format(len(res),1000-len(res)))
 
-    trainloader = Generator(1500, C2I, 200, randomTrainingExample2)
+    trainloader = Generator(2500, C2I, 200, randomTrainingExample2)
     testloader = Generator(200, C2I, 1000, randomTrainingExample2)
 
     runner = ModelRunner(learning_rate, is_cuda)
