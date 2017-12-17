@@ -29,17 +29,13 @@ def parse_word_tag(line, is_tagged, replace_numbers, lower_case):
 
 
 def scan_input_file(path, W2I=None, T2I=None, F2I=None,
-                    UNK_WORD="*UNK*", START_WORD="*START*", END_WORD="*END*",
+                    UNK_WORD="*UNK*",
                     lower_case=False, replace_numbers=True, calc_sub_word=False):
     calc_W = W2I == None
     calc_T = T2I == None
     calc_F = F2I == None and calc_sub_word
     if calc_W:
-        W2I = StringCounter([START_WORD, END_WORD, UNK_WORD], UNK_WORD)
-    else:
-        # Pretrained (probably not necessary)
-        W2I.get_id_and_update(START_WORD)
-        W2I.get_id_and_update(END_WORD)
+        W2I = StringCounter([UNK_WORD], UNK_WORD)
     if calc_T:
         T2I = StringCounter()
     if calc_F:
@@ -60,15 +56,8 @@ def scan_input_file(path, W2I=None, T2I=None, F2I=None,
                 num_words += 1
                 saw_empty_line = False
             else:
-                if not saw_empty_line:
-                    if calc_W:
-                        # Count appearences of START, END
-                        W2I.get_id_and_update(START_WORD)
-                        W2I.get_id_and_update(END_WORD)
-                    if calc_T:
-                        T2I.get_id_and_update(START_WORD)
-                        T2I.get_id_and_update(END_WORD)
-                    num_words += 2
+                #if not saw_empty_line:
+                #
                 saw_empty_line = True
 
     # Calc word features
@@ -83,8 +72,6 @@ def scan_input_file(path, W2I=None, T2I=None, F2I=None,
     if calc_W:
         W2I.filter_rare_words(RARE_WORDS_MAX_COUNT+1)
         W2I = StringCounter(W2I.S2I.keys(), W2I.UNK_WORD)
-        assert START_WORD in W2I.S2I
-        assert END_WORD in W2I.S2I
         assert UNK_WORD in W2I.S2I
 
     if calc_F:
@@ -107,16 +94,16 @@ def extract_features(word, F2I, updateF2I, count=1):
 
 
 def load_dataset(path, W2I=None, T2I=None, F2I=None,
-                 UNK_WORD="*UNK*", START_WORD="*START*", END_WORD="*END*",
+                 UNK_WORD="*UNK*",
                  lower_case=False, replace_numbers=True, calc_sub_word=False):
     num_words, W2I, T2I, F2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I,
-                                    UNK_WORD=UNK_WORD, START_WORD=START_WORD, END_WORD=END_WORD,
+                                    UNK_WORD=UNK_WORD,
                                     lower_case=lower_case, replace_numbers=replace_numbers,
                                     calc_sub_word=calc_sub_word)
 
     train_w_depth = FEATURES_PER_WORD+1 if calc_sub_word else 1
-    input_tensor = torch.LongTensor(num_words, train_w_depth)
-    labels_tensor = torch.LongTensor(num_words)
+    inputs = []
+    labels = []
 
     sentence = []
     sentence_labels = []
@@ -135,32 +122,37 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
                 saw_empty_line = False
             else:
                 if not saw_empty_line: # END of sentence
-                    sentence = [START_WORD] + sentence + [END_WORD]
                     sentence_len = len(sentence)
                     sentence_ids = [W2I.get_id(w) for w in sentence]
                     word_index += 2
 
-                    input_tensor[word_index-sentence_len:word_index,0] = torch.LongTensor(sentence_ids)
-                    if is_tagged:
-                        sentence_labels = [T2I.get_id(START_WORD)] + sentence_labels + [T2I.get_id(END_WORD)]
-                        labels_tensor[word_index-sentence_len:word_index] = torch.LongTensor(sentence_labels)
+                    input_tensor = torch.LongTensor(sentence_len, train_w_depth)
+                    label_tensor = torch.LongTensor(sentence_len)
 
+                    input_tensor[:,0] = torch.LongTensor(sentence_ids)
                     if F2I is not None:
                         features_ids = [extract_features(w, F2I, updateF2I=False) for w in sentence]
 
-                        input_tensor[word_index-sentence_len:word_index,1:] = torch.LongTensor(features_ids)
+                        input_tensor[:,1:] = torch.LongTensor(features_ids)
+                    inputs.append(input_tensor)
+
+                    if is_tagged:
+                        label_tensor[:] = torch.LongTensor(sentence_labels)
+                        labels.append(label_tensor)
+
                 saw_empty_line = True
                 sentence = []
                 sentence_labels = []
 
     if not is_tagged:
         print "blind file detected!"
-        labels_tensor[:] = 0 # No real value
+        #labels_tensor[:] = 0 # No real value
+        raise
 
     if calc_sub_word:
-        return W2I, T2I, F2I, input_tensor, labels_tensor
+        return W2I, T2I, F2I, inputs, labels
     else:
-        return W2I, T2I, input_tensor, labels_tensor
+        return W2I, T2I, inputs, labels
 
 
 def list_to_tuples(L, tup_size):
