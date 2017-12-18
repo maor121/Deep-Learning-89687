@@ -35,7 +35,9 @@ class Generator(object):
         lengths = [len(e) for e in sub_input]
         #sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
         input_tensor, labels_tensor = self.__build_tensors(sub_input, sub_labels)
+        self.current += 1
         return (input_tensor, lengths), labels_tensor
+
 
     next = __next__  # Python 2 compatibility
 
@@ -121,23 +123,28 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, input_list, labels_list = utils.load_dataset("../data/train")
+    W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
+    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
 
-    input_list, labels_list = sort_by_len(input_list, labels_list)
+    input_train, labels_train = sort_by_len(input_train, labels_train)
+    input_test, labels_test = sort_by_len(input_test, labels_test)
 
     is_cuda = False
-    batch_size = 128
+    batch_size = 100
     learning_rate = 0.001
     embedding_dim = 50
     hidden_dim = T2I.len() * 4
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 1
+    epoches = 10
 
-    trainloader = Generator(input_list, labels_list, batch_size)
+    trainloader = Generator(input_train, labels_train, batch_size)
+    testloader = Generator(input_test, labels_test, batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size, num_tags)
     runner.train(trainloader, epoches)
+
+    runner.eval(testloader)
 
     print(0)
