@@ -44,7 +44,7 @@ class Generator(object):
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape(1)
         input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
-        labels_tensor = torch.LongTensor(sub_input)
+        labels_tensor = torch.LongTensor(sub_labels)
         for i, e in enumerate(sub_input):
             l = len(e)
             offset = max_seq_len - l
