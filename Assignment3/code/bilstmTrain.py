@@ -98,17 +98,20 @@ class BiLSTMTagger(torch.nn.Module):
             a = a.cuda()
         max_seq_len = a.data.shape[1]
         words_depth = a.data.shape[2]
+
         b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
         c = self.word_embeddings(b)  # To (batch, seq_len*3, embed_depth)
         d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
 
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out, hidden = self.lstm(pack)
+        lstm_out, __ = self.lstm(pack)
+        lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out.data))
+        hidden_out = F.tanh(self.hidden_layer(lstm_out_unpacked))
         out = self.out_layer(hidden_out)
-        return out
+        out_packed = torch.nn.utils.rnn.pack_padded_sequence(out, lengths, batch_first=True)
+        return out_packed.data
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
@@ -136,7 +139,7 @@ if __name__ == '__main__':
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 5
+    epoches = 1
 
     trainloader = Generator(input_train, labels_train, batch_size)
     testloader = Generator(input_test, labels_test, batch_size)
