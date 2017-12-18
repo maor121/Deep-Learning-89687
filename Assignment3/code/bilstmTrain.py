@@ -79,28 +79,28 @@ class BiLSTMTagger(torch.nn.Module):
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = torch.nn.Linear(hidden_dim, target_size)
 
-    def init_hidden(self):
+    def _init_hidden(self, batch_size):
         # Before we've done anything, we dont have any hidden state.
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        self.hidden = (torch.autograd.Variable(torch.zeros(1, 1, self.hidden_dim)),
-                       torch.autograd.Variable(torch.zeros(1, 1, self.hidden_dim)))
+        return (torch.autograd.Variable(torch.zeros(1, batch_size, self.hidden_dim)),
+                       torch.autograd.Variable(torch.zeros(1, batch_size, self.hidden_dim)))
 
     def forward(self, sentence):
         a = sentence
+        batch_size = a.data.shape[0]
         max_seq_len = a.data.shape[1]
         words_depth = a.data.shape[2]
         b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
-        #c = self.word_embeddings.weight.data.numpy().take(b.data.numpy(), 0)
-        #c = Variable(torch.FloatTensor(c), volatile = not self.training)
         c = self.word_embeddings(b)  # To (batch, seq_len*3, embed_depth)
         d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
         #x = e.view(-1, self.embedding_dim * max_seq_len)
 
-        lstm_out, self.hidden = self.lstm(
-            e.view(-1, max_seq_len, words_depth), self.hidden)
+        f = e.permute(1,0,2) # Swap axes of seq_len <-> batch size because that is what lstm wants
+        hidden = self._init_hidden(batch_size)
+        lstm_out, self.hidden = self.lstm(f, hidden)
         # Remove padding
 
         out = self.hidden2tag(lstm_out.view(-1, max_seq_len))
