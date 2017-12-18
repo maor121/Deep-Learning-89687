@@ -9,11 +9,12 @@ from torch.utils.data import TensorDataset
 
 class LSTMTagger(nn.Module):
 
-    def __init__(self, embedding_dim, hidden_dim, vocab_size):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, is_cuda):
         super(LSTMTagger, self).__init__()
         target_size = 2
 
         self.hidden_dim = hidden_dim
+        self.is_cuda = is_cuda
 
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
 
@@ -35,7 +36,11 @@ class LSTMTagger(nn.Module):
     def forward(self, sentence):
         hidden = self._init_hidden()
 
-        embeds = self.word_embeddings(sentence)
+        input = Variable(sentence, volatile = not self.training)
+        if self.is_cuda:
+            input = input.cuda()
+
+        embeds = self.word_embeddings(input)
         lstm_out, hidden = self.lstm(
             embeds.view(len(sentence), 1, -1), hidden)
         out = self.hidden2tag(lstm_out.view(len(sentence), -1))
@@ -47,10 +52,8 @@ class ModelRunner:
         self.learning_rate = learning_rate
         self.is_cuda = is_cuda
     def initialize_random(self, embedding_dim, hidden_dim, vocab_size):
-        net = LSTMTagger(embedding_dim, hidden_dim, vocab_size)
+        net = LSTMTagger(embedding_dim, hidden_dim, vocab_size, self.is_cuda)
         if (self.is_cuda):
-            # from torch.backends import cudnn
-            # cudnn.benchmark = True
             net.cuda()
 
         self.criterion = nn.CrossEntropyLoss()
@@ -68,11 +71,10 @@ class ModelRunner:
                 # get the inputs
                 inputs, labels = data
 
-                # wrap them in Variable
-                inputs, labels = Variable(inputs), Variable(labels)
-
+                # wrap labels in Variable
+                labels = Variable(labels)
                 if self.is_cuda:
-                    inputs, labels = inputs.cuda(), labels.cuda()
+                    labels = labels.cuda()
 
                 # zero the parameter gradients
                 self.optimizer.zero_grad()

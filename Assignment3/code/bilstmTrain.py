@@ -6,7 +6,7 @@ import numpy as np
 
 def sort_by_len(input_tensor, labels_tensor):
     # Sort by size
-    x = [(i, l) for i, l in sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i))]
+    x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i)))]
     input_tensor, labels_tensor = zip(*x)
     return input_tensor, labels_tensor
 
@@ -32,9 +32,10 @@ class Generator(object):
             end = len(self._input)
         sub_input = self._input[start:end]
         sub_labels = self._labels[start:end]
-        sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
+        lengths = [len(e) for e in sub_input]
+        #sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
         input_tensor, labels_tensor = self.__build_tensors(sub_input, sub_labels)
-        return input_tensor, labels_tensor
+        return (input_tensor, lengths), labels_tensor
 
     next = __next__  # Python 2 compatibility
 
@@ -55,26 +56,27 @@ class Generator(object):
         labels_tensor = torch.zeros(batch_size, max_seq_len)
         for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
             length = len(e)
-            offset = max_seq_len - length
-            input_tensor[i, offset:max_seq_len] = e
-            labels_tensor[i, offset:max_seq_len] = l
+            #offset = max_seq_len - length
+            input_tensor[i, :length] = e
+            labels_tensor[i, :length] = l
         return input_tensor, labels_tensor
 
 
 class BiLSTMTagger(torch.nn.Module):
 
-    def __init__(self, embedding_dim, hidden_dim, vocab_size):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, is_cuda):
         super(BiLSTMTagger, self).__init__()
         target_size = 2
 
         self.hidden_dim = hidden_dim
         self.embedding_dim = embedding_dim
+        self.is_cuda = is_cuda
 
         self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim)
+        self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = torch.nn.Linear(hidden_dim, target_size)
@@ -84,11 +86,15 @@ class BiLSTMTagger(torch.nn.Module):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.autograd.Variable(torch.zeros(1, batch_size, self.hidden_dim)),
-                       torch.autograd.Variable(torch.zeros(1, batch_size, self.hidden_dim)))
+        return (torch.autograd.Variable(torch.zeros(batch_size, 1, self.hidden_dim)),
+                       torch.autograd.Variable(torch.zeros(batch_size, 1, self.hidden_dim)))
 
-    def forward(self, sentence):
-        a = sentence
+    def forward(self, input):
+        sentence, lengths = input
+
+        a = Variable(sentence, volatile=not self.training)
+        if self.is_cuda:
+            a = a.cuda()
         batch_size = a.data.shape[0]
         max_seq_len = a.data.shape[1]
         words_depth = a.data.shape[2]
@@ -96,20 +102,18 @@ class BiLSTMTagger(torch.nn.Module):
         c = self.word_embeddings(b)  # To (batch, seq_len*3, embed_depth)
         d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
-        #x = e.view(-1, self.embedding_dim * max_seq_len)
 
-        f = e.permute(1,0,2) # Swap axes of seq_len <-> batch size because that is what lstm wants
+        pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
         hidden = self._init_hidden(batch_size)
-        lstm_out, self.hidden = self.lstm(f, hidden)
-        # Remove padding
+        lstm_out, self.hidden = self.lstm(pack, hidden)
 
-        out = self.hidden2tag(lstm_out.view(-1, max_seq_len))
-        return torch.unsqueeze(out[-1],0)
+        out = self.hidden2tag(lstm_out.data)
+        return out
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
     def initialize_random(self, embedding_dim, hidden_dim, vocab_size):
-        net = BiLSTMTagger(embedding_dim, hidden_dim, vocab_size)
+        net = BiLSTMTagger(embedding_dim, hidden_dim, vocab_size, self.is_cuda)
         if (self.is_cuda):
             # from torch.backends import cudnn
             # cudnn.benchmark = True
