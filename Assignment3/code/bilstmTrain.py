@@ -27,6 +27,7 @@ class Generator(object):
         start = self.current * self._batch_size
         end =  (self.current+1) * self._batch_size
         if start >= len(self._input):
+            self.reset()
             raise StopIteration
         if end > len(self._input):
             end = len(self._input)
