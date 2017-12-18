@@ -1,5 +1,6 @@
 import torch
 from torch.autograd import Variable
+import torch.nn.functional as F
 
 import utils
 import numpy as np
@@ -72,23 +73,22 @@ class BiLSTMTagger(torch.nn.Module):
         self.hidden_dim = hidden_dim
         self.embedding_dim = embedding_dim
         self.is_cuda = is_cuda
+        is_bidirectional = True
+        lstm_num_layers = 2
 
         self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
+        self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim,
+                                  batch_first=True,
+                                  bidirectional=is_bidirectional,
+                                  num_layers=lstm_num_layers)
 
         # The linear layer that maps from hidden state space to tag space
-        self.hidden2tag = torch.nn.Linear(hidden_dim, target_size)
-
-    def _init_hidden(self, batch_size):
-        # Before we've done anything, we dont have any hidden state.
-        # Refer to the Pytorch documentation to see exactly
-        # why they have this dimensionality.
-        # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.autograd.Variable(torch.zeros(batch_size, 1, self.hidden_dim)),
-                       torch.autograd.Variable(torch.zeros(batch_size, 1, self.hidden_dim)))
+        hidden_layer_in_dim = hidden_dim*2 if is_bidirectional else hidden_dim
+        self.hidden_layer = torch.nn.Linear(hidden_layer_in_dim, hidden_layer_in_dim/2)
+        self.out_layer = torch.nn.Linear(hidden_layer_in_dim/2, target_size)
 
     def forward(self, input):
         sentence, lengths = input
@@ -96,7 +96,6 @@ class BiLSTMTagger(torch.nn.Module):
         a = Variable(sentence, volatile=not self.training)
         if self.is_cuda:
             a = a.cuda()
-        batch_size = a.data.shape[0]
         max_seq_len = a.data.shape[1]
         words_depth = a.data.shape[2]
         b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
@@ -105,10 +104,10 @@ class BiLSTMTagger(torch.nn.Module):
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
 
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        hidden = self._init_hidden(batch_size)
-        lstm_out, self.hidden = self.lstm(pack, hidden)
+        lstm_out, hidden = self.lstm(pack)
 
-        out = self.hidden2tag(lstm_out.data)
+        hidden_out = F.tanh(self.hidden_layer(lstm_out.data))
+        out = self.out_layer(hidden_out)
         return out
 
 from experiment import ModelRunner
@@ -132,12 +131,12 @@ if __name__ == '__main__':
 
     is_cuda = False
     batch_size = 100
-    learning_rate = 0.001
+    learning_rate = 0.01
     embedding_dim = 50
-    hidden_dim = T2I.len() * 4
+    hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 10
+    epoches = 5
 
     trainloader = Generator(input_train, labels_train, batch_size)
     testloader = Generator(input_test, labels_test, batch_size)

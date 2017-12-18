@@ -25,24 +25,14 @@ class LSTMTagger(nn.Module):
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, target_size)
 
-    def _init_hidden(self):
-        # Before we've done anything, we dont have any hidden state.
-        # Refer to the Pytorch documentation to see exactly
-        # why they have this dimensionality.
-        # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (autograd.Variable(torch.zeros(1, 1, self.hidden_dim)),
-                autograd.Variable(torch.zeros(1, 1, self.hidden_dim)))
-
     def forward(self, sentence):
-        hidden = self._init_hidden()
-
         input = Variable(sentence, volatile = not self.training)
         if self.is_cuda:
             input = input.cuda()
 
         embeds = self.word_embeddings(input)
         lstm_out, hidden = self.lstm(
-            embeds.view(len(sentence), 1, -1), hidden)
+            embeds.view(len(sentence), 1, -1))
         out = self.hidden2tag(lstm_out.view(len(sentence), -1))
         return torch.unsqueeze(out[-1],0)
 
