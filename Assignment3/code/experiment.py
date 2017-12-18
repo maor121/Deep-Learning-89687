@@ -104,7 +104,7 @@ class ModelRunner:
             features, labels = data
             if self.is_cuda:
                 labels = labels.cuda()
-            outputs = self.net(input)
+            outputs = self.net(features)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum()
