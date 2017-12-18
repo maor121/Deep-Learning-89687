@@ -1,4 +1,5 @@
 import torch
+from torch.autograd import Variable
 
 import utils
 import numpy as np
@@ -67,6 +68,7 @@ class BiLSTMTagger(torch.nn.Module):
         target_size = 2
 
         self.hidden_dim = hidden_dim
+        self.embedding_dim = embedding_dim
 
         self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim)
 
@@ -87,17 +89,21 @@ class BiLSTMTagger(torch.nn.Module):
 
     def forward(self, sentence):
         a = sentence
-        words_depth = a.data.shape[1]
-        b = a.view(-1, words_depth)  # Unroll to (batch, 3)
-        c = self.embed1(b)  # To (batch, 5*3, embed_depth)
-        d = c.view(-1, self.window_size * 2 + 1, words_depth, self.embed_depth)  # Roll to (batch, 5, 3, 50)
-        e = d.sum(2)  # Sum along 3rd axis -> (batch, 5, 50)
-        x = e.view(-1, self.embed_depth * (self.window_size * 2 + 1))
+        max_seq_len = a.data.shape[1]
+        words_depth = a.data.shape[2]
+        b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
+        #c = self.word_embeddings.weight.data.numpy().take(b.data.numpy(), 0)
+        #c = Variable(torch.FloatTensor(c), volatile = not self.training)
+        c = self.word_embeddings(b)  # To (batch, seq_len*3, embed_depth)
+        d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
+        e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
+        #x = e.view(-1, self.embedding_dim * max_seq_len)
 
-        embeds = self.word_embeddings(sentence)
         lstm_out, self.hidden = self.lstm(
-            embeds.view(len(sentence), 1, -1), self.hidden)
-        out = self.hidden2tag(lstm_out.view(len(sentence), -1))
+            e.view(-1, max_seq_len, words_depth), self.hidden)
+        # Remove padding
+
+        out = self.hidden2tag(lstm_out.view(-1, max_seq_len))
         return torch.unsqueeze(out[-1],0)
 
 from experiment import ModelRunner
@@ -129,7 +135,7 @@ if __name__ == '__main__':
 
     trainloader = Generator(input_list, labels_list, batch_size)
 
-    runner = ModelRunner(learning_rate, is_cuda)
+    runner = BlistmRunner(learning_rate, is_cuda)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
     runner.train(trainloader, epoches)
 
