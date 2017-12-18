@@ -31,6 +31,7 @@ class Generator(object):
     @staticmethod
     def __shuffle_input_labels(sub_input, sub_labels):
 
+        #np.random.permutation(10)
 if __name__ == '__main__':
     W2I, T2I, input_tensor, labels_tensor = utils.load_dataset("../data/train")
 

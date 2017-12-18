@@ -161,7 +161,7 @@ if __name__ == '__main__':
         C2I[c] = len(C2I)
 
 
-    trainloader = Generator(1500, C2I, 200, randomTrainingExample)
+    trainloader = Generator(2500, C2I, 200, randomTrainingExample)
     testloader = Generator(200, C2I, 10000, randomTrainingExample)
 
     runner = ModelRunner(learning_rate, is_cuda)
