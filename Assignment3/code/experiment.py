@@ -102,9 +102,8 @@ class ModelRunner:
         total = 0
         for i, data in enumerate(testloader):
             features, labels = data
-            input = Variable(features, volatile=True)
             if self.is_cuda:
-                input, labels = input.cuda(), labels.cuda()
+                labels = labels.cuda()
             outputs = self.net(input)
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)

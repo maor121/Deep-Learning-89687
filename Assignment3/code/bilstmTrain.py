@@ -53,20 +53,18 @@ class Generator(object):
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape[1]
         input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
-        labels_tensor = torch.zeros(batch_size, max_seq_len)
+        labels_tensor = torch.cat(sub_labels)
         for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
             length = len(e)
             #offset = max_seq_len - length
             input_tensor[i, :length] = e
-            labels_tensor[i, :length] = l
         return input_tensor, labels_tensor
 
 
 class BiLSTMTagger(torch.nn.Module):
 
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, is_cuda):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, target_size, is_cuda):
         super(BiLSTMTagger, self).__init__()
-        target_size = 2
 
         self.hidden_dim = hidden_dim
         self.embedding_dim = embedding_dim
@@ -112,11 +110,9 @@ class BiLSTMTagger(torch.nn.Module):
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
-    def initialize_random(self, embedding_dim, hidden_dim, vocab_size):
-        net = BiLSTMTagger(embedding_dim, hidden_dim, vocab_size, self.is_cuda)
+    def initialize_random(self, embedding_dim, hidden_dim, vocab_size, target_size):
+        net = BiLSTMTagger(embedding_dim, hidden_dim, vocab_size, target_size, self.is_cuda)
         if (self.is_cuda):
-            # from torch.backends import cudnn
-            # cudnn.benchmark = True
             net.cuda()
 
         self.criterion = torch.nn.CrossEntropyLoss()
@@ -135,12 +131,13 @@ if __name__ == '__main__':
     embedding_dim = 50
     hidden_dim = T2I.len() * 4
     vocab_size = W2I.len()
+    num_tags = T2I.len()
     epoches = 1
 
     trainloader = Generator(input_list, labels_list, batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
-    runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
+    runner.initialize_random(embedding_dim, hidden_dim, vocab_size, num_tags)
     runner.train(trainloader, epoches)
 
     print(0)
