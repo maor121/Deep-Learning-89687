@@ -1,3 +1,5 @@
+import torch
+
 import utils
 import numpy as np
 
@@ -20,18 +22,34 @@ class Generator(object):
     def __next__(self):
         start = self.current * self._batch_size
         end =  (self.current+1) * self._batch_size
-        if end > len(self._input):
+        if start >= len(self._input):
             raise StopIteration
+        if end > len(self._input):
+            end = len(self._input)
         sub_input = self._input[start:end]
         sub_labels = self._labels[start:end]
-        max_seq_len = max([len(seq) for seq in sub_input])
-        sub_input, sub_input = shuffle_input_labels(sub_input, sub_labels)
-
-
+        sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
+        input_tensor, labels_tensor = self.__build_tensors(sub_input, sub_labels)
+        return input_tensor, labels_tensor
     @staticmethod
     def __shuffle_input_labels(sub_input, sub_labels):
-
-        #np.random.permutation(10)
+        num_examples = len(sub_input)
+        permutations = np.random.permutation(num_examples)
+        sub_input = sub_input[permutations]
+        sub_labels = sub_labels[permutations]
+        return sub_input, sub_labels
+    @staticmethod
+    def __build_tensors(sub_input, sub_labels):
+        batch_size = len(sub_input)
+        max_seq_len = max([len(seq) for seq in sub_input])
+        seq_depth = sub_input[0].shape(1)
+        input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
+        labels_tensor = torch.LongTensor(sub_input)
+        for i, e in enumerate(sub_input):
+            l = len(e)
+            offset = max_seq_len - l
+            input_tensor[i, offset:max_seq_len] = e
+        return input_tensor, labels_tensor
 if __name__ == '__main__':
     W2I, T2I, input_tensor, labels_tensor = utils.load_dataset("../data/train")
 
