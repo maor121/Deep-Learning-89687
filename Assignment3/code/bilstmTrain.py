@@ -34,9 +34,8 @@ class Generator(object):
             end = len(self._input)
         sub_input = self._input[start:end]
         sub_labels = self._labels[start:end]
-        lengths = [len(e) for e in sub_input]
         #sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
-        input_tensor, labels_tensor = self.__build_tensors(sub_input, sub_labels)
+        (input_tensor, lengths), labels_tensor = self.__build_tensors(sub_input, sub_labels)
         self.current += 1
         return (input_tensor, lengths), labels_tensor
 
@@ -57,14 +56,17 @@ class Generator(object):
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape[1]
         input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
-        #labels_tensor = torch.cat(sub_labels)
-        labels_tensor = torch.zeros(batch_size, max_seq_len).long()
+        #labels_tensor = torch.zeros(batch_size, max_seq_len).long()
+        labels_tensor = torch.cat(sub_labels).long()
+        lengths = []
         for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
             length = len(e)
             #offset = max_seq_len - length
             input_tensor[i, :length] = e
-            labels_tensor[i, :length] = l
-        return input_tensor, labels_tensor.view(-1)
+            #labels_tensor[i, :length] = l
+            lengths.append(length)
+        #labels_packed = torch.nn.utils.rnn.pack_padded_sequence(labels_tensor, lengths, batch_first=True)
+        return (input_tensor, lengths), labels_tensor
 
 
 class BiLSTMTagger(torch.nn.Module):
@@ -109,17 +111,16 @@ class BiLSTMTagger(torch.nn.Module):
         d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
 
-        #pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out, __ = self.lstm(e)
-        #lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
+        pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
+        lstm_out, __ = self.lstm(pack)
 
-        # Index of the last output for each sequence.
-        #idx = (torch.LongTensor(lengths) - 1).view(-1, 1).expand(lstm_out_unpacked.size(0), lstm_out_unpacked.size(2)).unsqueeze(1)
+        #pack_padded_sequence changes order, fix it back
+        lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
+        lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out))
+        hidden_out = F.tanh(self.hidden_layer(lstm_out_chained))
         out = self.out_layer(hidden_out)
-        #out_packed = torch.nn.utils.rnn.pack_padded_sequence(out, lengths, batch_first=True)
-        return out.view(-1,45)
+        return out
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
@@ -128,7 +129,7 @@ class BlistmRunner(ModelRunner):
         if (self.is_cuda):
             net.cuda()
 
-        self.criterion = torch.nn.CrossEntropyLoss(ignore_index=0)
+        self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
         self.net = net
 
