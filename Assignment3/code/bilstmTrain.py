@@ -66,23 +66,6 @@ class Generator(object):
         return (input_tensor, lengths), labels_tensor
 
 
-class biLSTM(torch.nn.Module):
-    def __init__(self, embedding_dim, hidden_dim, num_layers):
-        super(biLSTM, self).__init__()
-        self.layers = np.ndarray(num_layers, dtype=object)
-        self.num_layers = num_layers
-
-        for i in range(num_layers):
-            self.layers[i] = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True, bidirectional=True)
-
-    def forward(self, input, hx=None):
-        b_input = input
-        for i in range(self.num_layers):
-            b_layer, __ = self.layers[i](b_input)
-            #split b_f, b_b
-            b_input = torch.cat(b_f,b_b)
-        return b_input
-
 class BiLSTMTagger(torch.nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, target_size, is_cuda):
@@ -105,8 +88,7 @@ class BiLSTMTagger(torch.nn.Module):
 
         # The linear layer that maps from hidden state space to tag space
         hidden_layer_in_dim = hidden_dim*2 if is_bidirectional else hidden_dim
-        self.hidden_layer = torch.nn.Linear(hidden_layer_in_dim, hidden_layer_in_dim/2)
-        self.out_layer = torch.nn.Linear(hidden_layer_in_dim/2, target_size)
+        self.out_layer = torch.nn.Linear(hidden_layer_in_dim, target_size)
 
     def forward(self, input):
         #print(self.word_embeddings.weight.data[0], self.word_embeddings.weight.data[1])
@@ -135,8 +117,7 @@ class BiLSTMTagger(torch.nn.Module):
         lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
         lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out_chained))
-        out = self.out_layer(hidden_out)
+        out = self.out_layer(lstm_out_chained)
         return out
 
 from experiment import ModelRunner
