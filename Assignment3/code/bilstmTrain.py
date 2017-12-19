@@ -56,16 +56,12 @@ class Generator(object):
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape[1]
         input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
-        #labels_tensor = torch.zeros(batch_size, max_seq_len).long()
         labels_tensor = torch.cat(sub_labels).long()
         lengths = []
         for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
             length = len(e)
-            #offset = max_seq_len - length
             input_tensor[i, :length] = e
-            #labels_tensor[i, :length] = l
             lengths.append(length)
-        #labels_packed = torch.nn.utils.rnn.pack_padded_sequence(labels_tensor, lengths, batch_first=True)
         return (input_tensor, lengths), labels_tensor
 
 
