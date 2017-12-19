@@ -13,8 +13,8 @@ def sort_by_len(input_tensor, labels_tensor):
 
 class Generator(object):
     def __init__(self, input, labels, batch_size):
-        self._input = np.array(input)
-        self._labels = np.array(labels)
+        self._input = np.array(input, dtype=object)
+        self._labels = np.array(labels, dtype=object)
         self._batch_size = batch_size
         self.reset()
 
@@ -57,12 +57,14 @@ class Generator(object):
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape[1]
         input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
-        labels_tensor = torch.cat(sub_labels)
+        #labels_tensor = torch.cat(sub_labels)
+        labels_tensor = torch.zeros(batch_size, max_seq_len).long()
         for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
             length = len(e)
             #offset = max_seq_len - length
             input_tensor[i, :length] = e
-        return input_tensor, labels_tensor
+            labels_tensor[i, :length] = l
+        return input_tensor, labels_tensor.view(-1)
 
 
 class BiLSTMTagger(torch.nn.Module):
@@ -76,7 +78,7 @@ class BiLSTMTagger(torch.nn.Module):
         is_bidirectional = True
         lstm_num_layers = 2
 
-        self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim)
+        self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -91,6 +93,9 @@ class BiLSTMTagger(torch.nn.Module):
         self.out_layer = torch.nn.Linear(hidden_layer_in_dim/2, target_size)
 
     def forward(self, input):
+        #print(self.word_embeddings.weight.data[0], self.word_embeddings.weight.data[1])
+        #print(self.hidden_layer.weight[0])
+
         sentence, lengths = input
 
         a = Variable(sentence, volatile=not self.training)
@@ -104,14 +109,17 @@ class BiLSTMTagger(torch.nn.Module):
         d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
         e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
 
-        pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out, __ = self.lstm(pack)
-        lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
+        #pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
+        lstm_out, __ = self.lstm(e)
+        #lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out_unpacked))
+        # Index of the last output for each sequence.
+        #idx = (torch.LongTensor(lengths) - 1).view(-1, 1).expand(lstm_out_unpacked.size(0), lstm_out_unpacked.size(2)).unsqueeze(1)
+
+        hidden_out = F.tanh(self.hidden_layer(lstm_out))
         out = self.out_layer(hidden_out)
-        out_packed = torch.nn.utils.rnn.pack_padded_sequence(out, lengths, batch_first=True)
-        return out_packed.data
+        #out_packed = torch.nn.utils.rnn.pack_padded_sequence(out, lengths, batch_first=True)
+        return out.view(-1,45)
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
@@ -120,7 +128,7 @@ class BlistmRunner(ModelRunner):
         if (self.is_cuda):
             net.cuda()
 
-        self.criterion = torch.nn.CrossEntropyLoss()
+        self.criterion = torch.nn.CrossEntropyLoss(ignore_index=0)
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
         self.net = net
 
