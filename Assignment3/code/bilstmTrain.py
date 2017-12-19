@@ -66,6 +66,32 @@ class Generator(object):
         return (input_tensor, lengths), labels_tensor
 
 
+class biLSTM(torch.nn.Module):
+    def __init__(self, embedding_dim, hidden_dim, num_layers):
+        super(biLSTM, self).__init__()
+        self.layers = np.ndarray(num_layers, dtype=object)
+        self.num_layers = num_layers
+
+        for i in range(num_layers):
+            self.layers[i] = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True, bidirectional=True)
+
+    def forward(self, input, hx=None):
+        b_input = input
+        for i in range(self.num_layers):
+            b_layer, __ = self.layers[i](b_input)
+            #split b_f, b_b
+            b_input = torch.cat(b_f,b_b)
+        return b_input
+
+def flip(x, dim):
+    xsize = x.size()
+    dim = x.dim() + dim if dim < 0 else dim
+    x = x.view(-1, *xsize[dim:])
+    x = x.view(x.size(0), x.size(1), -1)[:, getattr(torch.arange(x.size(1)-1,
+                      -1, -1), ('cpu','cuda')[x.is_cuda])().long(), :]
+    return x.view(xsize)
+
+
 class BiLSTMTagger(torch.nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, target_size, is_cuda):
@@ -88,8 +114,7 @@ class BiLSTMTagger(torch.nn.Module):
 
         # The linear layer that maps from hidden state space to tag space
         hidden_layer_in_dim = hidden_dim*2 if is_bidirectional else hidden_dim
-        self.hidden_layer = torch.nn.Linear(hidden_layer_in_dim, hidden_layer_in_dim/2)
-        self.out_layer = torch.nn.Linear(hidden_layer_in_dim/2, target_size)
+        self.out_layer = torch.nn.Linear(hidden_layer_in_dim, target_size)
 
     def forward(self, input):
         #print(self.word_embeddings.weight.data[0], self.word_embeddings.weight.data[1])
@@ -111,13 +136,15 @@ class BiLSTMTagger(torch.nn.Module):
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
         lstm_out, __ = self.lstm(pack)
 
+        #TODO: check if we need to concat output of lstm and reversed lstm
+
         #pack_padded_sequence changes order so it can batch, fix it back
         #pack[1,0] == e[0,1]
         lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
+
         lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out_chained))
-        out = self.out_layer(hidden_out)
+        out = self.out_layer(lstm_out_chained)
         return out
 
 from experiment import ModelRunner
@@ -133,16 +160,15 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, F2I, input_train, labels_train = utils.load_dataset("../data/train",calc_sub_word=True)
-    __, __,__, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I, F2I=F2I,calc_sub_word=True)
+    W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
+    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
 
-    is_cuda = True
+    is_cuda = False
     batch_size = 100
     learning_rate = 0.01
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
-    features_size = F2I.len()
     num_tags = T2I.len()
     epoches = 2
 
@@ -150,7 +176,7 @@ if __name__ == '__main__':
     testloader = Generator(input_test, labels_test, batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
-    runner.initialize_random(embedding_dim, hidden_dim, vocab_size+features_size, num_tags)
+    runner.initialize_random(embedding_dim, hidden_dim, vocab_size, num_tags)
     runner.train(trainloader, epoches)
 
     runner.eval(testloader)

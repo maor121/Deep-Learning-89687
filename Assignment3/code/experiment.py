@@ -101,7 +101,7 @@ class ModelRunner:
             if i % 10 == 0 and i > 0:
                 print("evaluated: "+str(i))
         print('Accuracy of the network on the %d test words: %d %%' % (
-            total, 100 * correct / total))
+            total, 100.0 * correct / total))
 
 
 def randomTrainingExample(C2I, ex_max_len):
