@@ -20,6 +20,7 @@ class Generator(object):
 
     def reset(self):
         self.current = 0
+        self._input, self._labels = self.__shuffle_input_labels(self._input, self._labels)
 
     def __iter__(self):
         return self
@@ -34,7 +35,7 @@ class Generator(object):
             end = len(self._input)
         sub_input = self._input[start:end]
         sub_labels = self._labels[start:end]
-        #sub_input, sub_labels = self.__shuffle_input_labels(sub_input, sub_labels)
+        sub_input, sub_labels = sort_by_len(sub_input, sub_labels)
         (input_tensor, lengths), labels_tensor = self.__build_tensors(sub_input, sub_labels)
         self.current += 1
         return (input_tensor, lengths), labels_tensor
@@ -132,11 +133,8 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
-    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
-
-    input_train, labels_train = sort_by_len(input_train, labels_train)
-    input_test, labels_test = sort_by_len(input_test, labels_test)
+    W2I, T2I, F2I, input_train, labels_train = utils.load_dataset("../data/train",calc_sub_word=True)
+    __, __,__, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I, F2I=F2I,calc_sub_word=True)
 
     is_cuda = True
     batch_size = 100
@@ -144,6 +142,7 @@ if __name__ == '__main__':
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
+    features_size = F2I.len()
     num_tags = T2I.len()
     epoches = 2
 
@@ -151,7 +150,7 @@ if __name__ == '__main__':
     testloader = Generator(input_test, labels_test, batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
-    runner.initialize_random(embedding_dim, hidden_dim, vocab_size, num_tags)
+    runner.initialize_random(embedding_dim, hidden_dim, vocab_size+features_size, num_tags)
     runner.train(trainloader, epoches)
 
     runner.eval(testloader)
