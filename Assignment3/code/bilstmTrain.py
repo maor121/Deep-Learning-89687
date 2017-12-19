@@ -114,7 +114,8 @@ class BiLSTMTagger(torch.nn.Module):
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
         lstm_out, __ = self.lstm(pack)
 
-        #pack_padded_sequence changes order, fix it back
+        #pack_padded_sequence changes order so it can batch, fix it back
+        #pack[1,0] == e[0,1]
         lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
         lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
 
