@@ -138,7 +138,7 @@ if __name__ == '__main__':
     input_train, labels_train = sort_by_len(input_train, labels_train)
     input_test, labels_test = sort_by_len(input_test, labels_test)
 
-    is_cuda = False
+    is_cuda = True
     batch_size = 100
     learning_rate = 0.01
     embedding_dim = 50

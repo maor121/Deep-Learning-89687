@@ -103,11 +103,11 @@ def extract_features(word, F2I, updateF2I, count=1):
 
 def load_dataset(path, W2I=None, T2I=None, F2I=None,
                  UNK_WORD="*UNK*",
-                 lower_case=False, replace_numbers=True, calc_sub_word=False):
+                 lower_case=False, replace_numbers=True, calc_sub_word=False,calc_characters=False):
     num_words, W2I, T2I, F2I, C2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I,C2I=None,
                                     UNK_WORD=UNK_WORD,
                                     lower_case=lower_case, replace_numbers=replace_numbers,
-                                    calc_sub_word=calc_sub_word, calc_characters=False)
+                                    calc_sub_word=calc_sub_word, calc_characters=calc_characters)
 
     train_w_depth = FEATURES_PER_WORD+1 if calc_sub_word else 1
     inputs = []
@@ -143,7 +143,7 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
 
                         input_tensor[:,1:] = torch.LongTensor(features_ids)
                     if C2I is not None:
-                        characters_ids = [[C2I.get_id(c) for c in w] for w in sentence]
+                        characters_ids = [torch.LongTensor([C2I.get_id(c) for c in w]) for w in sentence]
 
                         inputs.append((input_tensor, characters_ids))
                     else:
@@ -165,7 +165,10 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
     if calc_sub_word:
         return W2I, T2I, F2I, inputs, labels
     else:
-        return W2I, T2I, inputs, labels
+        if calc_characters:
+            return W2I, T2I, C2I, inputs, labels
+        else:
+            return W2I, T2I, inputs, labels
 
 
 def list_to_tuples(L, tup_size):
