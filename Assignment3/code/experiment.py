@@ -100,7 +100,7 @@ class ModelRunner:
             correct += (predicted == labels).sum()
             if i % 10 == 0 and i > 0:
                 print("evaluated: "+str(i))
-        print('Accuracy of the network on the %d test words: %d %%' % (
+        print('Accuracy of the network on the %d test words: %.3f %%' % (
             total, 100.0 * correct / total))
 
 

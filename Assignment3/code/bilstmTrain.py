@@ -83,15 +83,6 @@ class biLSTM(torch.nn.Module):
             b_input = torch.cat(b_f,b_b)
         return b_input
 
-def flip(x, dim):
-    xsize = x.size()
-    dim = x.dim() + dim if dim < 0 else dim
-    x = x.view(-1, *xsize[dim:])
-    x = x.view(x.size(0), x.size(1), -1)[:, getattr(torch.arange(x.size(1)-1,
-                      -1, -1), ('cpu','cuda')[x.is_cuda])().long(), :]
-    return x.view(xsize)
-
-
 class BiLSTMTagger(torch.nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, target_size, is_cuda):
@@ -114,7 +105,8 @@ class BiLSTMTagger(torch.nn.Module):
 
         # The linear layer that maps from hidden state space to tag space
         hidden_layer_in_dim = hidden_dim*2 if is_bidirectional else hidden_dim
-        self.out_layer = torch.nn.Linear(hidden_layer_in_dim, target_size)
+        self.hidden_layer = torch.nn.Linear(hidden_layer_in_dim, hidden_layer_in_dim/2)
+        self.out_layer = torch.nn.Linear(hidden_layer_in_dim/2, target_size)
 
     def forward(self, input):
         #print(self.word_embeddings.weight.data[0], self.word_embeddings.weight.data[1])
@@ -141,10 +133,10 @@ class BiLSTMTagger(torch.nn.Module):
         #pack_padded_sequence changes order so it can batch, fix it back
         #pack[1,0] == e[0,1]
         lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
-
         lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
 
-        out = self.out_layer(lstm_out_chained)
+        hidden_out = F.tanh(self.hidden_layer(lstm_out_chained))
+        out = self.out_layer(hidden_out)
         return out
 
 from experiment import ModelRunner
@@ -163,7 +155,7 @@ if __name__ == '__main__':
     W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
     __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
 
-    is_cuda = False
+    is_cuda = True
     batch_size = 100
     learning_rate = 0.01
     embedding_dim = 50
