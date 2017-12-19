@@ -56,13 +56,38 @@ class Generator(object):
         batch_size = len(sub_input)
         max_seq_len = max([len(seq) for seq in sub_input])
         seq_depth = sub_input[0].shape[1]
-        input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
+        #input_tensor = torch.zeros(batch_size, max_seq_len, seq_depth).long()
         labels_tensor = torch.cat(sub_labels)
-        for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
-            length = len(e)
-            #offset = max_seq_len - length
-            input_tensor[i, :length] = e
-        return input_tensor, labels_tensor
+        #for i, (e,l) in enumerate(zip(sub_input,sub_labels)):
+        #    length = len(e)
+        #    #offset = max_seq_len - length
+        #    input_tensor[i, :length] = e
+        return sub_input, labels_tensor
+
+
+def size_splits(tensor, split_sizes, dim=0):
+    """Splits the tensor according to chunks of split_sizes.
+
+    Arguments:
+        tensor (Tensor): tensor to split.
+        split_sizes (list(int)): sizes of chunks
+        dim (int): dimension along which to split the tensor.
+    """
+    if dim < 0:
+        dim += tensor.dim()
+
+    dim_size = tensor.size(dim)
+    if dim_size != torch.sum(torch.Tensor(split_sizes)):
+        raise KeyError("Sum of split sizes exceeds tensor dim")
+
+    splits = torch.cumsum(torch.Tensor([0] + split_sizes), dim=0)[:-1]
+
+    return tuple(tensor.narrow(int(dim), int(start), int(length))
+                 for start, length in zip(splits, split_sizes))
+
+
+def pad(tensor, length):
+    return torch.cat([tensor, tensor.new(length - tensor.size(0), *tensor.size()[1:]).zero_()])
 
 
 class BiLSTMTagger(torch.nn.Module):
@@ -76,7 +101,7 @@ class BiLSTMTagger(torch.nn.Module):
         is_bidirectional = True
         lstm_num_layers = 2
 
-        self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim)
+        self.word_embeddings = torch.nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -93,25 +118,39 @@ class BiLSTMTagger(torch.nn.Module):
     def forward(self, input):
         sentence, lengths = input
 
-        a = Variable(sentence, volatile=not self.training)
-        if self.is_cuda:
-            a = a.cuda()
-        max_seq_len = a.data.shape[1]
-        words_depth = a.data.shape[2]
+        #a = Variable(sentence, volatile=not self.training)
+        #if self.is_cuda:
+        #    a = a.cuda()
+        #max_seq_len = a.data.shape[1]
+        batch_size = len(sentence)
+        words_depth = sentence[0].shape[1] #a.data.shape[2]
 
-        b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
-        c = self.word_embeddings(b)  # To (batch, seq_len*3, embed_depth)
-        d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
-        e = d.sum(2)  # Sum along 3rd axis -> (batch, seq_len, 50)
+        total_sum = sum(lengths)
+        a = Variable(torch.cat(sentence), volatile=not self.training)
 
-        pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
+        #b = a.view(-1, max_seq_len*words_depth)  # Unroll to (batch, seq_len*3)
+        c = self.word_embeddings(a)  # To (batch, seq_len*3, embed_depth)
+        #d = c.view(-1, max_seq_len, words_depth, self.embedding_dim)  # Roll to (batch, seq_len, 3, 50)
+        e = c.sum(1)  # Sum along 3rd axis -> (batch, seq_len, 50)
+
+        #f = size_splits(e, lengths, dim=0)
+        max_seq_len = sentence[0].shape[0]
+        #offset = 0
+        #f_padded = torch.zeros(batch_size,max_seq_len,self.embedding_dim)
+        #for i,l in enumerate(lengths):
+        #    f_padded[i,:l] = e[offset:offset+l]
+        #    offset += l
+
+        batch_sizes = [sum(map(bool, filter(lambda x: x >= i, lengths))) for i in range(1, max_seq_len + 1)]
+        offset = 0
+        padded = torch.cat([pad(i * 100 + torch.arange(1, 5 * l + 1).view(l, 1, 5), max_seq_len) for i, l in enumerate(lengths, 1)], 1)
+
+        pack = torch.nn.utils.rnn.pack_padded_sequence(f_padded, lengths, batch_first=True)
         lstm_out, __ = self.lstm(pack)
-        lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
 
-        hidden_out = F.tanh(self.hidden_layer(lstm_out_unpacked))
+        hidden_out = F.tanh(self.hidden_layer(lstm_out.data))
         out = self.out_layer(hidden_out)
-        out_packed = torch.nn.utils.rnn.pack_padded_sequence(out, lengths, batch_first=True)
-        return out_packed.data
+        return out
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
