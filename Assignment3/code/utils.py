@@ -28,18 +28,21 @@ def parse_word_tag(line, is_tagged, replace_numbers, lower_case):
     return is_tagged, word, tag
 
 
-def scan_input_file(path, W2I=None, T2I=None, F2I=None,
+def scan_input_file(path, W2I=None, T2I=None, F2I=None, C2I=None,
                     UNK_WORD="*UNK*",
-                    lower_case=False, replace_numbers=True, calc_sub_word=False):
+                    lower_case=False, replace_numbers=True, calc_sub_word=False, calc_characters=False):
     calc_W = W2I == None
     calc_T = T2I == None
     calc_F = F2I == None and calc_sub_word
+    calc_C = C2I == None and calc_characters
     if calc_W:
         W2I = StringCounter([UNK_WORD], UNK_WORD)
     if calc_T:
         T2I = StringCounter()
     if calc_F:
         F2I = StringCounter([UNK_WORD], UNK_WORD=UNK_WORD)
+    if calc_C:
+        C2I = StringCounter([UNK_WORD], UNK_WORD=UNK_WORD)
 
     num_words = 0
     saw_empty_line = True
@@ -51,6 +54,9 @@ def scan_input_file(path, W2I=None, T2I=None, F2I=None,
                 is_tagged, w, t = parse_word_tag(line, is_tagged, replace_numbers, lower_case)
                 if calc_W:
                     W2I.get_id_and_update(w)
+                if calc_C:
+                    for c in w:
+                        C2I.get_id_and_update(c)
                 if calc_T and is_tagged:
                     T2I.get_id_and_update(t)
                 num_words += 1
@@ -74,10 +80,12 @@ def scan_input_file(path, W2I=None, T2I=None, F2I=None,
         W2I = StringCounter(W2I.S2I.keys(), W2I.UNK_WORD)
         assert UNK_WORD in W2I.S2I
 
+    if calc_W:
+        W2I.add_pad_loc_0() # 0 is pad
     if calc_F:
         F2I.shift_ids_by(W2I.len())
 
-    return num_words, W2I, T2I, F2I
+    return num_words, W2I, T2I, F2I, C2I
 
 def extract_features(word, F2I, updateF2I, count=1):
     """Return a torch.LongTensor of features per word."""
@@ -96,10 +104,10 @@ def extract_features(word, F2I, updateF2I, count=1):
 def load_dataset(path, W2I=None, T2I=None, F2I=None,
                  UNK_WORD="*UNK*",
                  lower_case=False, replace_numbers=True, calc_sub_word=False):
-    num_words, W2I, T2I, F2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I,
+    num_words, W2I, T2I, F2I, C2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I,C2I=None,
                                     UNK_WORD=UNK_WORD,
                                     lower_case=lower_case, replace_numbers=replace_numbers,
-                                    calc_sub_word=calc_sub_word)
+                                    calc_sub_word=calc_sub_word, calc_characters=False)
 
     train_w_depth = FEATURES_PER_WORD+1 if calc_sub_word else 1
     inputs = []
@@ -134,7 +142,12 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
                         features_ids = [extract_features(w, F2I, updateF2I=False) for w in sentence]
 
                         input_tensor[:,1:] = torch.LongTensor(features_ids)
-                    inputs.append(input_tensor)
+                    if C2I is not None:
+                        characters_ids = [[C2I.get_id(c) for c in w] for w in sentence]
+
+                        inputs.append((input_tensor, characters_ids))
+                    else:
+                        inputs.append(input_tensor)
 
                     if is_tagged:
                         label_tensor[:] = torch.LongTensor(sentence_labels)
@@ -207,3 +220,7 @@ class StringCounter:
             S2I[k] = v + n
         self.S2I = S2I
 
+    def add_pad_loc_0(self):
+        self.shift_ids_by(1)
+        self.S2I["*PAD*"] = 0
+        self.S2C["*PAD*"] = 100
