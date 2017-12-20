@@ -1,6 +1,5 @@
 import torch
-from torch.autograd import Variable
-import torch.nn.functional as F
+import bilstm
 
 import utils
 import numpy as np
@@ -64,16 +63,11 @@ class BiLSTMTagger(torch.nn.Module):
         self.hidden_dim = hidden_dim
         self.repr_W = repr_W
         self.is_cuda = is_cuda
-        is_bidirectional = True
-        lstm_num_layers = 2
 
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.bilstm = torch.nn.LSTM(self.repr_W._embedding_dim, hidden_dim,
-                                  batch_first=True,
-                                  bidirectional=is_bidirectional,
-                                  num_layers=lstm_num_layers)
+        self.bilstm = bilstm.BiLSTM(self.repr_W._embedding_dim, hidden_dim)
 
         # The linear layer that maps from hidden state space to tag space
         hidden_layer_in_dim = hidden_dim*2 if is_bidirectional else hidden_dim
@@ -121,7 +115,8 @@ if __name__ == '__main__':
     epoches = 2
 
     import repr_w
-    repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
+    #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
+    repr_W = repr_w.repr_w_B(vocab_size, 1, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train, batch_size)
     testloader = Generator(input_test, labels_test, batch_size)
