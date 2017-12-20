@@ -120,11 +120,14 @@ if __name__ == '__main__':
     num_tags = T2I.len()
     epoches = 2
 
+    import repr_w
+    repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
+
     trainloader = Generator(input_train, labels_train, batch_size)
     testloader = Generator(input_test, labels_test, batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
-    runner.initialize_random(embedding_dim, hidden_dim, vocab_size, num_tags)
+    runner.initialize_random(repr_W, hidden_dim, num_tags)
     runner.train(trainloader, epoches)
 
     runner.eval(testloader)
