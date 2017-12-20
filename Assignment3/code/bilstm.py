@@ -24,10 +24,14 @@ def flip_packed_sequence(pack):
 
 class BiLSTM(torch.nn.Module):
     """bilstm per the exercise definition"""
-    def __init__(self, in_dim, out_dim):
+    def __init__(self, in_dim, out_dim, is_cuda):
         super(BiLSTM, self).__init__()
         self.lstm = torch.nn.LSTM(in_dim, out_dim, batch_first=True)
         self.revlstm = torch.nn.LSTM(in_dim, out_dim, batch_first=True)
+        if is_cuda:
+            self.lstm.cuda()
+            self.revlstm.cuda()
+            self.cuda()
 
     def forward(self, input):
         rev_input = flip_packed_sequence(input)
@@ -48,14 +52,14 @@ class BiLSTM(torch.nn.Module):
 
 
 class MultLayerBiLSTM(torch.nn.Module):
-    def __init__(self, in_dim, out_dim, num_layers):
+    def __init__(self, in_dim, out_dim, num_layers, is_cuda):
         super(MultLayerBiLSTM, self).__init__()
-        self.lstm_layers = np.ndarray(num_layers, dtype=object)
+        self.lstm_layers = []
         for i in range(num_layers):
-            self.lstm_layers[i] = BiLSTM(in_dim, out_dim)
+            self.lstm_layers.append(BiLSTM(in_dim, out_dim, is_cuda))
             in_dim = out_dim*2
+
+        if is_cuda:
+            self.cuda()
     def forward(self, input):
-        for bilstm in self.lstm_layers:
-            #TODO: debug this
-            input = bilstm(input)
-        return input
+        return self.lstm_layers[0](input)

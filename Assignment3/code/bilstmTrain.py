@@ -67,21 +67,24 @@ class BiLSTMTagger(torch.nn.Module):
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        #self.bilstm = bilstm.BiLSTM(self.repr_W._embedding_dim, hidden_dim)
-        self.bilstm = torch.nn.LSTM(self.repr_W._embedding_dim, hidden_dim,
+        self.bilstm = bilstm.MultLayerBiLSTM(self.repr_W._embedding_dim, hidden_dim, 1, is_cuda)
+        """self.bilstm = torch.nn.LSTM(self.repr_W._embedding_dim, hidden_dim,
                                     batch_first=True,
                                     bidirectional=True,
-                                    num_layers=1)
+                                    num_layers=2)"""
 
         # The linear layer that maps from hidden state space to tag space
         hidden_layer_in_dim = hidden_dim*2
         self.out_layer = torch.nn.Linear(hidden_layer_in_dim, target_size)
 
+        if is_cuda:
+            self.cuda()
+
     def forward(self, input):
         e, lengths = self.repr_W(input)
 
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out, __ = self.bilstm(pack)
+        lstm_out = self.bilstm(pack)
 
         #TODO: check if we need to concat output of lstm and reversed lstm
 
@@ -98,8 +101,6 @@ from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
     def initialize_random(self, repr_W, hidden_dim, target_size):
         net = BiLSTMTagger(repr_W, hidden_dim, target_size, self.is_cuda)
-        if (self.is_cuda):
-            net.cuda()
 
         self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
@@ -117,7 +118,7 @@ if __name__ == '__main__':
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 2
+    epoches = 5
 
     import repr_w
     repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
