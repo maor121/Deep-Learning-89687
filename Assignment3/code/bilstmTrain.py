@@ -107,7 +107,7 @@ if __name__ == '__main__':
     W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/train", calc_characters=True)
     __, __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I,C2I=C2I, calc_characters=True)
 
-    is_cuda = True
+    is_cuda = False
     batch_size = 100
     learning_rate = 0.01
     embedding_dim = 50

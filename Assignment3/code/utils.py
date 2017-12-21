@@ -13,7 +13,7 @@ DIGIT_PATTERN = re.compile('\d')
 
 def sort_by_len(input_tensor, labels_tensor, dim=None):
     # Sort by size
-    if dim:
+    if dim is not None:
         x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i[dim])))]
     else:
         x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i)))]
