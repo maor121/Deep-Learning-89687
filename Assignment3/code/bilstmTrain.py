@@ -79,7 +79,7 @@ class BiLSTMTagger(torch.nn.Module):
         e, lengths = self.repr_W(input)
 
         pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out = self.bilstm(pack)
+        lstm_out, __ = self.bilstm(pack)
 
         #TODO: check if we need to concat output of lstm and reversed lstm
 
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 
     import repr_w
     #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
-    repr_W = repr_w.repr_w_B(vocab_size, embedding_dim, 1, is_cuda)
+    repr_W = repr_w.repr_w_B(vocab_size, embedding_dim, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train, batch_size)
     testloader = Generator(input_test, labels_test, batch_size)
