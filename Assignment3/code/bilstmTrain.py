@@ -6,10 +6,9 @@ import numpy as np
 
 
 class Generator(object):
-    def __init__(self, input, labels, batch_size):
+    def __init__(self, input, labels):
         self._input = np.array(input, dtype=object)
         self._labels = np.array(labels, dtype=object)
-        self._batch_size = batch_size
         self.reset()
 
     def reset(self):
@@ -20,20 +19,13 @@ class Generator(object):
         return self
 
     def __next__(self):
-        start = self.current * self._batch_size
-        end =  (self.current+1) * self._batch_size
-        if start >= len(self._input):
+        if self.current >= len(self._input):
             self.reset()
             raise StopIteration
-        if end > len(self._input):
-            end = len(self._input)
-        sub_input = self._input[start:end]
-        sub_labels = self._labels[start:end]
-        sub_input, sub_labels = utils.sort_by_len(sub_input, sub_labels, dim=0)
-        labels_tensor = self.__build_labels_tensors(sub_labels)
+        input = self._input[self.current]
+        label = self._labels[self.current]
         self.current += 1
-        return sub_input, labels_tensor
-
+        return input, label
 
     next = __next__  # Python 2 compatibility
 
@@ -44,10 +36,6 @@ class Generator(object):
         sub_input = sub_input[permutations]
         sub_labels = sub_labels[permutations]
         return sub_input, sub_labels
-
-    @staticmethod
-    def __build_labels_tensors(sub_labels):
-        return torch.cat(sub_labels).long()
 
 
 class BiLSTMTagger(torch.nn.Module):
@@ -76,22 +64,12 @@ class BiLSTMTagger(torch.nn.Module):
             self.cuda()
 
     def forward(self, input):
-        e, lengths = self.repr_W(input)
+        e = self.repr_W(input)
 
-        pack = torch.nn.utils.rnn.pack_padded_sequence(e, lengths, batch_first=True)
-        lstm_out, __ = self.bilstm(pack)
+        lstm_out, __ = self.bilstm(e)
 
-        #TODO: check if we need to concat output of lstm and reversed lstm
-
-        #pack_padded_sequence changes order so it can batch, fix it back
-        #pack[1,0] == e[1,0,0] == e[batch,seq,feature_size]
-        #pack[100,0] == e[0,1,0]
-
-        lstm_out_unpacked, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
-        lstm_out_chained = torch.cat([lstm_out_unpacked[batch, :l] for batch, l in enumerate(lengths)])
-
-        out = self.out_layer(lstm_out_chained)
-        return out
+        out = self.out_layer(lstm_out)
+        return torch.squeeze(out, 0) # batch_size = 1
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
@@ -104,29 +82,29 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/train", calc_characters=True)
-    __, __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I,C2I=C2I, calc_characters=True)
+    W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
 
     is_cuda = True
-    batch_size = 100
-    learning_rate = 0.01
+    learning_rate = 0.001
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 5
+    epoches = 2
 
     import repr_w
-    #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
-    repr_W = repr_w.repr_w_B(vocab_size, embedding_dim, embedding_dim, is_cuda)
+    repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
+    #repr_W = repr_w.repr_w_B(vocab_size, embedding_dim, embedding_dim, is_cuda)
 
-    trainloader = Generator(input_train, labels_train, batch_size)
-    testloader = Generator(input_test, labels_test, batch_size)
+    trainloader = Generator(input_train, labels_train)
 
     runner = BlistmRunner(learning_rate, is_cuda)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
     runner.train(trainloader, epoches)
 
+    # Eval
+    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
+    testloader = Generator(input_test, labels_test)
     runner.eval(testloader)
 
     print(0)
