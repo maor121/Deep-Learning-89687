@@ -39,6 +39,8 @@ class ReprW(torch.nn.Module):
 
         self.embeddings = torch.nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
 
+        if self._is_cuda:
+            self.cuda()
 
 class repr_w_A_C(ReprW):
     def __init__(self, vocab_size, embedding_dim, is_cuda):
