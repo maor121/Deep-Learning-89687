@@ -41,7 +41,7 @@ class repr_w_B(repr_w_A_C):
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
     def forward(self, input):
-        characters = [i[1] for i in input]
+        characters = input[1]
 
         sentence_embeddings = []
         for word in characters:
@@ -51,6 +51,6 @@ class repr_w_B(repr_w_A_C):
         word_features = []
         for word_embeddings in sentence_embeddings:
             lstm_out, __ = self.lstm(word_embeddings)
-            word_features.append(lstm_out[-1])
+            word_features.append(lstm_out[:,-1])
 
         return word_features
