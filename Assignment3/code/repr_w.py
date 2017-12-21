@@ -55,7 +55,7 @@ class repr_w_B(repr_w_A_C):
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
     def forward(self, input):
-        characters, __ = input
+        characters = [i[1] for i in input]
 
         characters_embeddings = []
         for sentence in characters:
@@ -72,10 +72,10 @@ class repr_w_B(repr_w_A_C):
             lstm_out, __ = self.lstm(pack)
             unpack, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
 
-            last_feature_per_word = [[unpack[:,l-1,:] for l in lengths] for l in lengths]
-            last_feature_per_word = torch.cat(last_feature_per_word)
+            last_feature_per_word = [unpack[:,l-1,:] for l in lengths for l in lengths]
+            last_feature_per_word = torch.stack(last_feature_per_word, 1)
 
-            last_feature_per_word = last_feature_per_word[sen_order]
+            last_feature_per_word = last_feature_per_word[sen_order,:,:]
 
             lengths.append(len(last_feature_per_word))
             word_features.append(last_feature_per_word)

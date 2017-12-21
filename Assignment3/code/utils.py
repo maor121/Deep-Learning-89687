@@ -11,9 +11,12 @@ FEATURES_PER_WORD = 2
 DIGIT_PATTERN = re.compile('\d')
 
 
-def sort_by_len(input_tensor, labels_tensor):
+def sort_by_len(input_tensor, labels_tensor, dim=None):
     # Sort by size
-    x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i)))]
+    if dim:
+        x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i[dim])))]
+    else:
+        x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i)))]
     input_tensor, labels_tensor = zip(*x)
     return input_tensor, labels_tensor
 
@@ -124,8 +127,6 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
     train_w_depth = FEATURES_PER_WORD+1 if calc_sub_word else 1
     inputs = []
     labels = []
-    inputs_words = []
-    inputs_characters = []
 
     sentence = []
     sentence_labels = []
@@ -157,10 +158,11 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
 
                         input_tensor[:,1:] = torch.LongTensor(features_ids)
 
-                    inputs_words.append(input_tensor)
                     if C2I is not None:
                         characters_ids = [torch.unsqueeze(torch.LongTensor([C2I.get_id(c) for c in w]),1) for w in sentence]
-                        inputs_characters.append(characters_ids)
+                        inputs.append((input_tensor, characters_ids))
+                    else:
+                        inputs.append(input_tensor)
 
                     if is_tagged:
                         label_tensor[:] = torch.LongTensor(sentence_labels)
@@ -169,11 +171,6 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
                 saw_empty_line = True
                 sentence = []
                 sentence_labels = []
-
-    if C2I is not None:
-        inputs = (inputs_words, inputs_characters)
-    else:
-        inputs = inputs_words
 
     if not is_tagged:
         print "blind file detected!"

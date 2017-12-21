@@ -29,7 +29,7 @@ class Generator(object):
             end = len(self._input)
         sub_input = self._input[start:end]
         sub_labels = self._labels[start:end]
-        sub_input, sub_labels = utils.sort_by_len(sub_input, sub_labels)
+        sub_input, sub_labels = utils.sort_by_len(sub_input, sub_labels, dim=0)
         labels_tensor = self.__build_labels_tensors(sub_labels)
         self.current += 1
         return sub_input, labels_tensor
