@@ -11,6 +11,14 @@ FEATURES_PER_WORD = 2
 DIGIT_PATTERN = re.compile('\d')
 
 
+def sort_by_len(input_tensor, labels_tensor):
+    # Sort by size
+    x = [(i, l) for i, l in reversed(sorted(zip(input_tensor, labels_tensor), key=lambda (i, l): len(i)))]
+    input_tensor, labels_tensor = zip(*x)
+    return input_tensor, labels_tensor
+
+
+
 def parse_word_tag(line, is_tagged, replace_numbers, lower_case):
     tag = None
     if is_tagged:
@@ -80,12 +88,16 @@ def scan_input_file(path, W2I=None, T2I=None, F2I=None, C2I=None,
         W2I = StringCounter(W2I.S2I.keys(), W2I.UNK_WORD)
         assert UNK_WORD in W2I.S2I
 
+    # Id shifts
+    if calc_C:
+        C2I.add_pad_loc_0() # 0 is pad
     if calc_W:
         W2I.add_pad_loc_0() # 0 is pad
     if calc_F:
         F2I.shift_ids_by(W2I.len())
 
     return num_words, W2I, T2I, F2I, C2I
+
 
 def extract_features(word, F2I, updateF2I, count=1):
     """Return a torch.LongTensor of features per word."""
@@ -101,10 +113,10 @@ def extract_features(word, F2I, updateF2I, count=1):
     return [prefix_3_id, suffix_3_id]
 
 
-def load_dataset(path, W2I=None, T2I=None, F2I=None,
+def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
                  UNK_WORD="*UNK*",
                  lower_case=False, replace_numbers=True, calc_sub_word=False,calc_characters=False):
-    num_words, W2I, T2I, F2I, C2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I,C2I=None,
+    num_words, W2I, T2I, F2I, C2I = scan_input_file(path, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
                                     UNK_WORD=UNK_WORD,
                                     lower_case=lower_case, replace_numbers=replace_numbers,
                                     calc_sub_word=calc_sub_word, calc_characters=calc_characters)
@@ -112,6 +124,8 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
     train_w_depth = FEATURES_PER_WORD+1 if calc_sub_word else 1
     inputs = []
     labels = []
+    inputs_words = []
+    inputs_characters = []
 
     sentence = []
     sentence_labels = []
@@ -142,12 +156,11 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
                         features_ids = [extract_features(w, F2I, updateF2I=False) for w in sentence]
 
                         input_tensor[:,1:] = torch.LongTensor(features_ids)
-                    if C2I is not None:
-                        characters_ids = [torch.LongTensor([C2I.get_id(c) for c in w]) for w in sentence]
 
-                        inputs.append((input_tensor, characters_ids))
-                    else:
-                        inputs.append(input_tensor)
+                    inputs_words.append(input_tensor)
+                    if C2I is not None:
+                        characters_ids = [torch.unsqueeze(torch.LongTensor([C2I.get_id(c) for c in w]),1) for w in sentence]
+                        inputs_characters.append(characters_ids)
 
                     if is_tagged:
                         label_tensor[:] = torch.LongTensor(sentence_labels)
@@ -156,6 +169,11 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None,
                 saw_empty_line = True
                 sentence = []
                 sentence_labels = []
+
+    if C2I is not None:
+        inputs = (inputs_words, inputs_characters)
+    else:
+        inputs = inputs_words
 
     if not is_tagged:
         print "blind file detected!"

@@ -1,6 +1,8 @@
 import torch
 from torch.autograd import Variable
 
+import utils
+
 
 def build_padded_tensor_from_list(id_list):
     batch_size = len(id_list)
@@ -46,34 +48,37 @@ class repr_w_A_C(ReprW):
         return e, lengths
 
 
-class repr_w_B(ReprW):
+class repr_w_B(repr_w_A_C):
     def __init__(self, vocab_size, embedding_dim, hidden_dim, is_cuda):
         super(repr_w_B, self).__init__(vocab_size, embedding_dim, is_cuda)
         self.hidden_dim = hidden_dim
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
     def forward(self, input):
-        characters = input
+        characters, __ = input
 
         characters_embeddings = []
         for sentence in characters:
             # batch all the characters in the sentence
-            sentence_padded, lengths = build_padded_tensor_from_list(sentence)
-            a = Variable(sentence_padded, volatile=not self.training)
-            if self._is_cuda:
-                a = a.cuda()
-            sentence_embeddings = self.embeddings(a)
-            characters_embeddings.append((sentence_embeddings,lengths))
+            sen_order = range(len(sentence))
+            sentence, sen_order = utils.sort_by_len(sentence, sen_order)
+            sentence_embeddings, lengths = super(repr_w_B, self).forward(sentence)
+            characters_embeddings.append((sentence_embeddings,lengths, sen_order))
 
         word_features = []
         lengths = []
-        for sentence_embeddings, lengths in characters_embeddings:
+        for sentence_embeddings, lengths, sen_order in characters_embeddings:
             pack = torch.nn.utils.rnn.pack_padded_sequence(sentence_embeddings, lengths, batch_first=True)
             lstm_out, __ = self.lstm(pack)
-            unpack = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
-            last_feature_per_word = unpack[-1]
+            unpack, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
+
+            last_feature_per_word = [[unpack[:,l-1,:] for l in lengths] for l in lengths]
+            last_feature_per_word = torch.cat(last_feature_per_word)
+
+            last_feature_per_word = last_feature_per_word[sen_order]
 
             lengths.append(len(last_feature_per_word))
             word_features.append(last_feature_per_word)
+        # rearrange
 
         return word_features, lengths
