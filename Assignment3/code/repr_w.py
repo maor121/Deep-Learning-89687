@@ -68,17 +68,19 @@ class repr_w_B(repr_w_A_C):
         word_features = []
         lengths = []
         for sentence_embeddings, lengths, sen_order in characters_embeddings:
+            #[words_in_sentence,max_word_len,embed_depth]
             pack = torch.nn.utils.rnn.pack_padded_sequence(sentence_embeddings, lengths, batch_first=True)
             lstm_out, __ = self.lstm(pack)
             unpack, __ = torch.nn.utils.rnn.pad_packed_sequence(lstm_out, batch_first=True)
 
-            last_feature_per_word = [unpack[:,l-1,:] for l in lengths for l in lengths]
-            last_feature_per_word = torch.stack(last_feature_per_word, 1)
+            last_feature_per_word = [unpack[i,l-1,:] for i, l in enumerate(lengths)] #last feature per word
+            last_feature_per_word = torch.stack(last_feature_per_word)
 
-            last_feature_per_word = last_feature_per_word[sen_order,:,:]
+            last_feature_per_word = last_feature_per_word[sen_order,:]
 
             lengths.append(len(last_feature_per_word))
             word_features.append(last_feature_per_word)
         # rearrange
 
+        word_features, __ = build_padded_tensor_from_list(word_features)
         return word_features, lengths
