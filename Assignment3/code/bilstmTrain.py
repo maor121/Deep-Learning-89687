@@ -1,31 +1,89 @@
 import torch
-import bilstm
+from torch.utils.data import TensorDataset
 
 import utils
 import numpy as np
 
 
 class Generator(object):
-    def __init__(self, input, labels):
-        self._input = np.array(input, dtype=object)
-        self._labels = np.array(labels, dtype=object)
+    def __init__(self, input, labels, batch_size = 3):
+        self._input = input
+        self._labels = labels
+
+        sorted_input, labels = utils.sort_by_len(input, labels, dim=0)
+        batches = []
+        batch_labels = []
+        batch_inputs = []
+        last_seq_size = len(sorted_input[0][0])
+        for seq, lab in zip(sorted_input, labels):
+            seq_len = len(seq[0])
+            if seq_len != last_seq_size:
+                batches.append((batch_inputs,batch_labels))
+                batch_labels = []
+                batch_inputs = []
+                last_seq_size = seq_len
+            else:
+                batch_inputs.append(seq)
+                batch_labels.append(lab)
+        self.loaders = []
+        for sub_input, sub_labels in batches:
+            self.loaders.append(
+                DataLoader(sub_input, sub_labels, batch_size=batch_size)
+            )
+
         self.reset()
 
     def reset(self):
-        self.current = 0
-        self._input, self._labels = self.__shuffle_input_labels(self._input, self._labels)
+        self.loader_iterators = [loader.__iter__() for loader in self.loaders]
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        if self.current >= len(self._input):
+        import random
+
+        if len(self.loader_iterators) == 0:
             self.reset()
             raise StopIteration
-        input = self._input[self.current]
-        label = self._labels[self.current]
+
+        while True:
+            r_loader = random.choice(self.loader_iterators)
+            try:
+                next_batch = r_loader.next()
+                return next_batch
+            except StopIteration:
+                self.loader_iterators.remove(r_loader)
+
+    next = __next__  # Python 2 compatibility
+
+
+class DataLoader(object):
+    def __init__(self, input, labels, batch_size):
+        self._input = np.array(input, dtype=object)
+        self._labels = np.array(labels, dtype=object)
+
+        self.current = 0
+        self._batch_size = batch_size
+        self.reset()
+
+    def reset(self):
+        self._input, self._labels = self.__shuffle_input_labels(self._input, self._labels)
+        self.current = 0
+    def __iter__(self):
+        return self
+    def __next__(self):
+        start = self.current * self._batch_size
+        end =  (self.current+1) * self._batch_size
+        if start >= len(self._input):
+            self.reset()
+            raise StopIteration
+        if end > len(self._input):
+            end = len(self._input)
+        sub_input = self._input[start:end]
+        sub_labels = self._labels[start:end]
+        labels_tensor = torch.cat(sub_labels)
         self.current += 1
-        return input, label
+        return sub_input, labels_tensor
 
     next = __next__  # Python 2 compatibility
 
@@ -37,7 +95,6 @@ class Generator(object):
         sub_labels = sub_labels[permutations]
         return sub_input, sub_labels
 
-
 class BiLSTMTagger(torch.nn.Module):
 
     def __init__(self, repr_W, hidden_dim, target_size, is_cuda):
@@ -46,7 +103,7 @@ class BiLSTMTagger(torch.nn.Module):
         self.hidden_dim = hidden_dim
         self.repr_W = repr_W
         self.is_cuda = is_cuda
-
+        self.target_size = target_size
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
@@ -69,7 +126,7 @@ class BiLSTMTagger(torch.nn.Module):
         lstm_out, __ = self.bilstm(e)
 
         out = self.out_layer(lstm_out)
-        return torch.squeeze(out, 0) # batch_size = 1
+        return out.view(-1, self.target_size) # unroll to a long vector
 
 from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
@@ -82,7 +139,7 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I,C2I, input_train, labels_train = utils.load_dataset("../data/train", calc_characters=True)
+    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/train", calc_characters=True)
 
     is_cuda = True
     learning_rate = 0.001

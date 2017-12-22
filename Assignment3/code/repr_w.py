@@ -17,7 +17,7 @@ class repr_w_A_C(ReprW):
 
     def forward(self, input):
         # Tensor
-        sequence = torch.unsqueeze(input,0) # batch_size = 1
+        sequence = torch.stack(input,0) # first dim is batch. all of the same length
         a = Variable(sequence, volatile=not self.training)
         if self._is_cuda:
             a = a.cuda()
@@ -41,20 +41,23 @@ class repr_w_B(repr_w_A_C):
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
     def forward(self, input):
-        characters = input[1]
+        characters = [i[1] for i in input]
 
-        sentence_embeddings = []
-        for word in characters:
-            word_embeddings = super(repr_w_B, self).forward(word)
-            sentence_embeddings.append(word_embeddings)
+        batch_word_features = []
+        for sentence_characters in characters:
+            sentence_embeddings = []
+            for word in sentence_characters:
+                word_embeddings = super(repr_w_B, self).forward([word])
+                sentence_embeddings.append(word_embeddings)
 
-        word_features = []
-        for word_embeddings in sentence_embeddings:
-            lstm_out, __ = self.lstm(word_embeddings)
-            word_features.append(lstm_out[:,-1])
+            word_features = []
+            for word_embeddings in sentence_embeddings:
+                lstm_out, __ = self.lstm(word_embeddings)
+                word_features.append(lstm_out[:,-1])
 
+            batch_word_features.append(torch.stack(word_features, dim=1))
 
-        return torch.stack(word_features, dim=1)
+        return torch.cat(batch_word_features, 0)
     def out_dim(self):
         return self.hidden_dim
 
@@ -72,7 +75,7 @@ class repr_w_D(torch.nn.Module):
             self.cuda()
 
     def forward(self, input):
-        words = input[0]
+        words = [i[0] for i in input]
         word_emb = self.repr_w_words(words)
         char_emb = self.repr_w_chars(input)
 
