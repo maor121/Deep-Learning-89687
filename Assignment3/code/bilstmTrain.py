@@ -6,17 +6,17 @@ import numpy as np
 
 
 class Generator(object):
-    def __init__(self, input, labels, batch_size = 3):
+    def __init__(self, input, labels, batch_size = 3, sort_dim=None):
         self._input = input
         self._labels = labels
 
-        sorted_input, labels = utils.sort_by_len(input, labels, dim=0)
+        sorted_input, labels = utils.sort_by_len(input, labels, dim=sort_dim)
         batches = []
         batch_labels = []
         batch_inputs = []
-        last_seq_size = len(sorted_input[0][0])
+        last_seq_size = len(sorted_input[0]) if sort_dim is None else len(sorted_input[0][sort_dim])
         for seq, lab in zip(sorted_input, labels):
-            seq_len = len(seq[0])
+            seq_len = len(seq) if sort_dim is None else len(seq[sort_dim])
             if seq_len != last_seq_size:
                 batches.append((batch_inputs,batch_labels))
                 batch_labels = []
@@ -53,6 +53,9 @@ class Generator(object):
                 return next_batch
             except StopIteration:
                 self.loader_iterators.remove(r_loader)
+                if len(self.loader_iterators) == 0:
+                    self.reset()
+                    raise StopIteration
 
     next = __next__  # Python 2 compatibility
 
@@ -139,21 +142,21 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/train", calc_characters=True)
+    W2I, T2I, input_train, labels_train = utils.load_dataset("../data/train")
 
     is_cuda = True
     learning_rate = 0.001
     embedding_dim = 10
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
-    num_chars = C2I.len()
+    #num_chars = C2I.len()
     num_tags = T2I.len()
     epoches = 1
 
     import repr_w
-    #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
+    repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
     #repr_W = repr_w.repr_w_B(num_chars, embedding_dim, embedding_dim, is_cuda)
-    repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
+    #repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train)
 
@@ -162,7 +165,7 @@ if __name__ == '__main__':
     runner.train(trainloader, epoches)
 
     # Eval
-    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I, C2I=C2I, calc_characters=True)
+    __, __, input_test, labels_test = utils.load_dataset("../data/dev", W2I=W2I, T2I=T2I)
     testloader = Generator(input_test, labels_test)
     runner.eval(testloader)
 
