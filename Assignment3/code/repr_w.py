@@ -11,7 +11,6 @@ class ReprW(torch.nn.Module):
 
         self.embeddings = torch.nn.Embedding(vocab_size, embedding_dim, padding_idx=0)
 
-
 class repr_w_A_C(ReprW):
     def __init__(self, vocab_size, embedding_dim, is_cuda):
         super(repr_w_A_C, self).__init__(vocab_size, embedding_dim, is_cuda)
@@ -32,11 +31,12 @@ class repr_w_A_C(ReprW):
         e = d.sum(2)  # Sum along 3rd axis -> (seq_len, 50)
 
         return e
-
+    def out_dim(self):
+        return self._embedding_dim
 
 class repr_w_B(repr_w_A_C):
-    def __init__(self, vocab_size, embedding_dim, hidden_dim, is_cuda):
-        super(repr_w_B, self).__init__(vocab_size, embedding_dim, is_cuda)
+    def __init__(self, num_chars, embedding_dim, hidden_dim, is_cuda):
+        super(repr_w_B, self).__init__(num_chars, embedding_dim, is_cuda)
         self.hidden_dim = hidden_dim
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
@@ -55,3 +55,29 @@ class repr_w_B(repr_w_A_C):
 
 
         return torch.stack(word_features, dim=1)
+    def out_dim(self):
+        return self.hidden_dim
+
+class repr_w_D(torch.nn.Module):
+    def __init__(self, num_words, num_characters, char_embed_dim, char_dim_out, word_embed_dim, hidden_dim, is_cuda):
+        super(repr_w_D, self).__init__()
+        self.repr_w_words = repr_w_A_C(num_words, word_embed_dim, is_cuda)
+        self.repr_w_chars = repr_w_B(num_characters, char_embed_dim, char_dim_out, is_cuda)
+
+        linear_in_dim = self.repr_w_words.out_dim() + self.repr_w_chars.out_dim()
+        self.linear_out = hidden_dim
+        self.linear_layer = torch.nn.Linear(linear_in_dim, self.linear_out)
+
+        if is_cuda:
+            self.cuda()
+
+    def forward(self, input):
+        words = input[0]
+        word_emb = self.repr_w_words(words)
+        char_emb = self.repr_w_chars(input)
+
+        linear_in = torch.cat([word_emb, char_emb], 2)
+
+        return self.linear_layer(linear_in)
+    def out_dim(self):
+        return self.linear_out

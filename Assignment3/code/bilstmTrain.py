@@ -51,7 +51,7 @@ class BiLSTMTagger(torch.nn.Module):
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
         #self.bilstm = bilstm.MultLayerBiLSTM(self.repr_W._embedding_dim, hidden_dim, 1, is_cuda)
-        self.bilstm = torch.nn.LSTM(self.repr_W._embedding_dim, hidden_dim,
+        self.bilstm = torch.nn.LSTM(self.repr_W.out_dim(), hidden_dim,
                                     batch_first=True,
                                     bidirectional=True,
                                     num_layers=2)
@@ -86,15 +86,17 @@ if __name__ == '__main__':
 
     is_cuda = True
     learning_rate = 0.001
-    embedding_dim = 50
+    embedding_dim = 10
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
+    num_chars = C2I.len()
     num_tags = T2I.len()
-    epoches = 3
+    epoches = 1
 
     import repr_w
     #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
-    repr_W = repr_w.repr_w_B(vocab_size, embedding_dim, embedding_dim, is_cuda)
+    #repr_W = repr_w.repr_w_B(num_chars, embedding_dim, embedding_dim, is_cuda)
+    repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train)
 
