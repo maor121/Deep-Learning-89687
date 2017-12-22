@@ -53,4 +53,5 @@ class repr_w_B(repr_w_A_C):
             lstm_out, __ = self.lstm(word_embeddings)
             word_features.append(lstm_out[:,-1])
 
-        return word_features
+
+        return torch.stack(word_features, dim=1)
