@@ -44,31 +44,32 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/ner/train", calc_characters=True)
+    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/pos/train", calc_characters=True)
 
     is_cuda = True
     learning_rate = 0.001
+    batch_size = 20
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_chars = C2I.len()
     num_tags = T2I.len()
-    epoches = 5
+    epoches = 1
 
     import repr_w
     #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
     repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
     #repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
 
-    trainloader = Generator(input_train, labels_train, sort_dim=0)
+    trainloader = Generator(input_train, labels_train, sort_dim=0, batch_size=batch_size)
 
     runner = BlistmRunner(learning_rate, is_cuda)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
     runner.train(trainloader, epoches)
 
     # Eval
-    __, __,__, input_test, labels_test = utils.load_dataset("../data/ner/dev", W2I=W2I, T2I=T2I, calc_characters=True)
-    testloader = Generator(input_test, labels_test, sort_dim=0)
+    __, __,__, input_test, labels_test = utils.load_dataset("../data/pos/dev", W2I=W2I, T2I=T2I, C2I=C2I, calc_characters=True)
+    testloader = Generator(input_test, labels_test, sort_dim=0, batch_size=batch_size)
     runner.eval(testloader)
 
     print(0)

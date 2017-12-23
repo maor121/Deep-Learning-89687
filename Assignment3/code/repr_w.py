@@ -42,7 +42,6 @@ class repr_w_B(repr_w_A_C):
 
     def forward(self, input):
         import batchers
-        import utils
 
         characters = [i[1] for i in input]
 
@@ -52,7 +51,7 @@ class repr_w_B(repr_w_A_C):
 
         all_words_char_seqs = [word_seq for sent_words in characters for word_seq in sent_words]  # concat lists
         org_idxs = torch.range(0, len(all_words_char_seqs)-1).long()
-        batcher = batchers.Generator(all_words_char_seqs, org_idxs, flattened_labels=True)
+        batcher = batchers.Generator(all_words_char_seqs, org_idxs, flattened_labels=True, batch_size=10)
 
         all_word_features = []
         all_word_idx = []
@@ -64,11 +63,35 @@ class repr_w_B(repr_w_A_C):
             all_word_idx.extend(sub_org_idx)
 
         # rearrange
-        all_word_features_stacked = torch.stack(all_word_features)[all_word_idx,:]
+        reverse_idx = [i for i,idx in sorted([(i,idx) for i, idx in enumerate(all_word_idx)], key=lambda (i,idx): idx)]
+        all_word_features_stacked = torch.stack(all_word_features)[reverse_idx,:]
 
         word_features_per_sentence = torch.split(all_word_features_stacked, sent_length, 0)
 
         return torch.stack(word_features_per_sentence)
+
+
+    """For testing def forward(self, input):
+        characters = [i[1] for i in input]
+
+        result = []
+        for sent_chars in characters:
+            sentence_embeddings = []
+            for word in sent_chars:
+                word_embeddings = super(repr_w_B, self).forward([word])
+                sentence_embeddings.append(word_embeddings)
+
+            word_features = []
+            for word_embeddings in sentence_embeddings:
+                lstm_out, __ = self.lstm(word_embeddings)
+                word_features.append(lstm_out[:,-1])
+
+            result.append(torch.stack(word_features, dim=1))
+
+        forward_slow = torch.cat(result, 0)
+        forward_fast = self.forward1(input,sentence_embeddings,forward_slow)
+        return forward_slow
+    """
     def out_dim(self):
         return self.hidden_dim
 
