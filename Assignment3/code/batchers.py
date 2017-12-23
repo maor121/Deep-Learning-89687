@@ -8,7 +8,7 @@ import numpy as np
 
 
 class Generator(object):
-    def __init__(self, input, labels, batch_size = 10, sort_dim=None, flattened_labels=False):
+    def __init__(self, input, labels, batch_size = 20, sort_dim=None, flattened_labels=False):
         self._input = input
         self._labels = labels
         self._flattened_labels = flattened_labels

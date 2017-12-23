@@ -44,16 +44,16 @@ class BlistmRunner(ModelRunner):
 
 
 if __name__ == '__main__':
-    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/pos/train", calc_characters=True)
+    W2I, T2I, C2I, input_train, labels_train = utils.load_dataset("../data/ner/train", calc_characters=True)
 
-    is_cuda = False
+    is_cuda = True
     learning_rate = 0.001
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_chars = C2I.len()
     num_tags = T2I.len()
-    epoches = 1
+    epoches = 5
 
     import repr_w
     #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
@@ -67,7 +67,7 @@ if __name__ == '__main__':
     runner.train(trainloader, epoches)
 
     # Eval
-    __, __,__, input_test, labels_test = utils.load_dataset("../data/pos/dev", W2I=W2I, T2I=T2I, C2I=C2I, calc_characters=True)
+    __, __,__, input_test, labels_test = utils.load_dataset("../data/ner/dev", W2I=W2I, T2I=T2I, calc_characters=True)
     testloader = Generator(input_test, labels_test, sort_dim=0)
     runner.eval(testloader)
 

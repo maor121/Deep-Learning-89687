@@ -59,14 +59,14 @@ class repr_w_B(repr_w_A_C):
         for sub_words_list, sub_org_idx in batcher:
             sub_words_embeddings = super(repr_w_B, self).forward(sub_words_list)
             lstm_out, __ = self.lstm(sub_words_embeddings)
-            sub_word_features = lstm_out[:, -1]
+            sub_word_features = lstm_out[:, -1,:]
             all_word_features.extend(sub_word_features)
             all_word_idx.extend(sub_org_idx)
 
         # rearrange
-        all_word_features = torch.stack(all_word_features)[all_word_idx,:]
+        all_word_features_stacked = torch.stack(all_word_features)[all_word_idx,:]
 
-        word_features_per_sentence = torch.split(all_word_features, sent_length, 0)
+        word_features_per_sentence = torch.split(all_word_features_stacked, sent_length, 0)
 
         return torch.stack(word_features_per_sentence)
     def out_dim(self):
