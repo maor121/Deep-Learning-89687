@@ -46,6 +46,10 @@ class repr_w_B(repr_w_A_C):
 
         characters = [i[1] for i in input]
 
+        sent_length = len(characters[0])
+        for sent in characters:
+            assert len(sent) == sent_length # Sentences must be uniform in size
+
         all_words_char_seqs = [word_seq for sent_words in characters for word_seq in sent_words]  # concat lists
         org_idxs = torch.range(0, len(all_words_char_seqs)-1).long()
         batcher = batchers.Generator(all_words_char_seqs, org_idxs, flattened_labels=True)
@@ -60,24 +64,11 @@ class repr_w_B(repr_w_A_C):
             all_word_idx.extend(sub_org_idx)
 
         # rearrange
-        all_word_features = utils.list_to_array(all_word_features)[all_word_idx]
+        all_word_features = torch.stack(all_word_features)[all_word_idx,:]
 
-        """
-            batch_embeddings.append(sentence_embeddings)
-            sentences_lengths.append(len(sentence_characters))
+        word_features_per_sentence = torch.split(all_word_features, sent_length, 0)
 
-            batch_word_features = []
-            sequence_batch = torch.cat(sub_words_list, 0)  # first dim is batch. all of the same length
-            lstm_out, __ = self.lstm(sequence_batch)
-
-            word_features = []
-            for word_embeddings in sentence_embeddings:
-                lstm_out, __ = self.lstm(word_embeddings)
-                word_features.append(lstm_out[:,-1])
-
-            batch_word_features.append(torch.stack(word_features, dim=1))
-        """
-        return torch.cat(batch_word_features, 0)
+        return torch.stack(word_features_per_sentence)
     def out_dim(self):
         return self.hidden_dim
 
