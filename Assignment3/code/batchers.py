@@ -22,12 +22,14 @@ class Generator(object):
             seq_len = len(seq) if sort_dim is None else len(seq[sort_dim])
             if seq_len != last_seq_size:
                 batches.append((batch_inputs,batch_labels))
-                batch_labels = []
-                batch_inputs = []
+                batch_labels = [lab]
+                batch_inputs = [seq]
                 last_seq_size = seq_len
             else:
                 batch_inputs.append(seq)
                 batch_labels.append(lab)
+        batches.append((batch_inputs, batch_labels))
+
         self.loaders = []
         for sub_input, sub_labels in batches:
             self.loaders.append(

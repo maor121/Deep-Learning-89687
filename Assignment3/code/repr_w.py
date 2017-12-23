@@ -47,7 +47,7 @@ class repr_w_B(repr_w_A_C):
         characters = [i[1] for i in input]
 
         all_words_char_seqs = [word_seq for sent_words in characters for word_seq in sent_words]  # concat lists
-        org_idxs = torch.range(0, len(all_words_char_seqs)).long()
+        org_idxs = torch.range(0, len(all_words_char_seqs)-1).long()
         batcher = batchers.Generator(all_words_char_seqs, org_idxs, flattened_labels=True)
 
         all_word_features = []
