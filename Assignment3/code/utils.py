@@ -2,6 +2,7 @@ import re
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
 
 RARE_WORDS_MAX_COUNT = 3
 RARE_FEATURE_MAX_COUNT = 3
@@ -9,6 +10,15 @@ RARE_FEATURE_MAX_COUNT = 3
 FEATURES_PER_WORD = 2
 
 DIGIT_PATTERN = re.compile('\d')
+
+
+def list_to_array(list):
+    """np.array() tries to infer nested dims, this is a simple list to array converter"""
+    arr = np.empty(len(list), dtype=object)
+    for i, o in enumerate(list):
+        arr[i] = o
+
+    return arr
 
 
 def sort_by_len(input_tensor, labels_tensor, dim=None):

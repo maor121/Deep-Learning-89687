@@ -41,14 +41,34 @@ class repr_w_B(repr_w_A_C):
         self.lstm = torch.nn.LSTM(embedding_dim, hidden_dim, batch_first=True)
 
     def forward(self, input):
+        import batchers
+        import utils
+
         characters = [i[1] for i in input]
 
-        batch_word_features = []
-        for sentence_characters in characters:
-            sentence_embeddings = []
-            for word in sentence_characters:
-                word_embeddings = super(repr_w_B, self).forward([word])
-                sentence_embeddings.append(word_embeddings)
+        all_words_char_seqs = [word_seq for sent_words in characters for word_seq in sent_words]  # concat lists
+        org_idxs = torch.range(0, len(all_words_char_seqs)).long()
+        batcher = batchers.Generator(all_words_char_seqs, org_idxs, flattened_labels=True)
+
+        all_word_features = []
+        all_word_idx = []
+        for sub_words_list, sub_org_idx in batcher:
+            sub_words_embeddings = super(repr_w_B, self).forward(sub_words_list)
+            lstm_out, __ = self.lstm(sub_words_embeddings)
+            sub_word_features = lstm_out[:, -1]
+            all_word_features.extend(sub_word_features)
+            all_word_idx.extend(sub_org_idx)
+
+        # rearrange
+        all_word_features = utils.list_to_array(all_word_features)[all_word_idx]
+
+        """
+            batch_embeddings.append(sentence_embeddings)
+            sentences_lengths.append(len(sentence_characters))
+
+            batch_word_features = []
+            sequence_batch = torch.cat(sub_words_list, 0)  # first dim is batch. all of the same length
+            lstm_out, __ = self.lstm(sequence_batch)
 
             word_features = []
             for word_embeddings in sentence_embeddings:
@@ -56,7 +76,7 @@ class repr_w_B(repr_w_A_C):
                 word_features.append(lstm_out[:,-1])
 
             batch_word_features.append(torch.stack(word_features, dim=1))
-
+        """
         return torch.cat(batch_word_features, 0)
     def out_dim(self):
         return self.hidden_dim
