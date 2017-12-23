@@ -54,12 +54,12 @@ if __name__ == '__main__':
     vocab_size = W2I.len()
     num_chars = C2I.len()
     num_tags = T2I.len()
-    epoches = 1
+    epoches = 5
 
     import repr_w
     #repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
-    repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
-    #repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
+    #repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
+    repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train, sort_dim=0, batch_size=batch_size)
 
