@@ -9,7 +9,7 @@ from docopt import docopt
 import utils
 
 if __name__ == '__main__':
-    import repr_w
+    from bilstmTrain import Generator
 
     arguments = docopt(__doc__, version='Naval Fate 2.0')
     train_file = arguments['<inputFile>']
@@ -28,16 +28,18 @@ if __name__ == '__main__':
 
     is_cuda = True
 
+    runner = None
+    W2I, T2I, F2I, C2I = None
+
+
     # Eval
-    __, __, __, __, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
+    __, __, __, __, input_test, labels_test = utils.load_dataset(train_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
                                                                  calc_characters=calc_characters,
                                                                  calc_sub_word=calc_sub_word)
     testloader = Generator(input_test, labels_test, batch_size=1000, sort_dim=sort_dim)
 
     omit_o_tag = T2I.get_id('O') if is_ner else False
 
-    runner = BlistmRunner(learning_rate, is_cuda, 500)
-    runner.initialize_random(repr_W, hidden_dim, num_tags)
-    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=True)
+    runner.predict(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=True)
 
     print(0)

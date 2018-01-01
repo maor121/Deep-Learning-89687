@@ -73,9 +73,9 @@ if __name__ == '__main__':
 
     is_cuda = True
     learning_rate = 0.001
-    batch_size = 5
+    batch_size = 20
     embedding_dim = 50
-    hidden_dim = T2I.len() * 2
+    hidden_dim = T2I.len() * 6
     vocab_size = W2I.len()
     num_tags = T2I.len()
     epoches = 5
@@ -106,5 +106,7 @@ if __name__ == '__main__':
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
     runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=True)
+
+    runner.eval(testloader, omit_tag_id=omit_o_tag, to_print=True)
 
     print(0)
