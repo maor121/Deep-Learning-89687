@@ -111,7 +111,7 @@ class ModelRunner:
             updates_per_epoch /= epoches
             plotter.show(updates_per_epoch, self.eval_every_n_examples)
 
-    def eval(self, testloader, omit_tag_id, to_print=True):
+    def eval(self, testloader, omit_tag_id=None, to_print=True):
         self.net.train(False)  # Disable dropout during eval mode
         correct = 0
         total = 0
