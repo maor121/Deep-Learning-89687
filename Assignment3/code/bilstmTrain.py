@@ -77,7 +77,7 @@ if __name__ == '__main__':
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 5
+    epoches = 1
 
     if repr == "a" or repr == "c":
         repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
@@ -91,13 +91,14 @@ if __name__ == '__main__':
 
     trainloader = Generator(input_train, labels_train, batch_size=batch_size, sort_dim=sort_dim)
 
+    # Eval
+    __, __, __, __, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
+                                                                 calc_characters=calc_characters,
+                                                                 calc_sub_word=calc_sub_word)
+    testloader = Generator(input_test, labels_test, batch_size=batch_size, sort_dim=sort_dim)
+
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
-    runner.train(trainloader, epoches)
-
-    # Eval
-    __,__,__,__, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I, calc_characters=calc_characters, calc_sub_word=calc_sub_word)
-    testloader = Generator(input_test, labels_test, batch_size=batch_size, sort_dim=sort_dim)
-    runner.eval(testloader)
+    runner.train(trainloader, epoches, testloader, omit_tag_id=None, plot=True)
 
     print(0)

@@ -53,8 +53,14 @@ class ModelRunner:
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
         self.net = net
-    def train(self, trainloader, epoches):
+    def train(self, trainloader, epoches, testloader=None, omit_tag_id=None, plot=False):
         self.net.train(True)
+        if plot:
+            from plot import PlotBatches
+            plotter = PlotBatches()
+        else:
+            plotter = None
+        updates_per_epoch = 0
         for epoch in range(epoches):  # loop over the dataset multiple times
 
             start_e_t = time.time()
@@ -91,13 +97,21 @@ class ModelRunner:
                 if examples_trained > self.eval_every_n_examples:
                     print('[%d] loss: %.3f timer_per_batch: %.3f' %
                           (epoch + 1, running_loss, (end_b_t - start_b_t)))
+                    if plot:
+                        test_acc = self.eval(testloader, omit_tag_id, to_print=False)
+                        plotter.update(running_loss, test_acc)
+                        updates_per_epoch += 1
+                        self.net.train(True)
                     running_loss = 0
                     batches_since_last_eval = 0
                     examples_trained -= self.eval_every_n_examples
             end_e_t = time.time()
             print('epoch time: %.3f' % (end_e_t - start_e_t))
+        if plot:
+            updates_per_epoch /= epoches
+            plotter.show(updates_per_epoch)
 
-    def eval(self, testloader):
+    def eval(self, testloader, omit_tag_id, to_print=True):
         self.net.train(False)  # Disable dropout during eval mode
         correct = 0
         total = 0
@@ -109,10 +123,13 @@ class ModelRunner:
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels).sum()
-            if i % 10 == 0 and i > 0:
+            if to_print and i % 10 == 0 and i > 0:
                 print("evaluated: "+str(i))
-        print('Accuracy of the network on the %d test words: %.3f %%' % (
-            total, 100.0 * correct / total))
+        acc = 1.0 * correct / total
+        if to_print:
+            print('Accuracy of the network on the %d test words: %.3f %%' % (
+                total, 100.0 * correct / total))
+        return acc
 
 
 def randomTrainingExample(C2I, ex_max_len):
