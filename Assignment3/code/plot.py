@@ -8,7 +8,7 @@ class PlotBatches(object):
     def update(self, train_loss, test_acc):
         self.train_history['train_loss'].append(train_loss)
         self.train_history['test_acc'].append(test_acc)
-    def show(self, updates_per_epoch):
+    def show(self, updates_per_epoch, batches_in_update):
         train_loss = np.array([i for i in self.train_history['train_loss']])
         test_acc = np.array([i for i in self.train_history['test_acc']])
 
@@ -16,14 +16,14 @@ class PlotBatches(object):
         ax = fig.add_subplot(111)
 
         plt.gca().cla()
-        plt.xlabel("epoches")
+        plt.xlabel("sentences")
         plt.plot(train_loss, label="Train Loss")
         plt.plot(test_acc, label="Test Accuracy")
 
 
         # scale
-        ticks = plt.gca().get_xticks() * (1.0/updates_per_epoch)
-        ticks = np.round(ticks, 2)
+        ticks = plt.gca().get_xticks() * (1.0*batches_in_update)
+        ticks = [int(n) for n in np.round(ticks, 2)]
         plt.gca().set_xticklabels(ticks)
 
         # Annotate epoches points

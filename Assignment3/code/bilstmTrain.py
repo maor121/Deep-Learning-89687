@@ -74,18 +74,18 @@ if __name__ == '__main__':
 
     is_cuda = True
     learning_rate = 0.001
-    batch_size = 10
+    batch_size = 5
     embedding_dim = 50
     hidden_dim = T2I.len() * 2
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 1
+    epoches = 5
 
-    if repr == "a" or repr == "c":
+    if repr in ['a', 'c']:
         repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
     else:
         num_chars = C2I.len()
-        if repr == "b":
+        if repr == 'b':
             repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
         else:
             #d

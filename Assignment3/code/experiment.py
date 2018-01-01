@@ -109,7 +109,7 @@ class ModelRunner:
             print('epoch time: %.3f' % (end_e_t - start_e_t))
         if plot:
             updates_per_epoch /= epoches
-            plotter.show(updates_per_epoch)
+            plotter.show(updates_per_epoch, self.eval_every_n_examples)
 
     def eval(self, testloader, omit_tag_id, to_print=True):
         self.net.train(False)  # Disable dropout during eval mode
