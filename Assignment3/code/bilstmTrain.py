@@ -99,7 +99,7 @@ if __name__ == '__main__':
                                                                  calc_sub_word=calc_sub_word)
     testloader = Generator(input_test, labels_test, batch_size=1000, sort_dim=sort_dim)
 
-    omit_o_tag = 'O' if is_ner else False
+    omit_o_tag = T2I.get_id('O') if is_ner else False
 
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
