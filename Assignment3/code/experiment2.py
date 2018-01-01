@@ -1,5 +1,12 @@
+"""Usage: experiment2.py <language_number>
+
+-h --help    show this
+
+"""
+from docopt import docopt
+
 import random
-from experiment import Generator, LSTMTagger, ModelRunner
+from experiment import Generator, ModelRunner
 
 def check_positive(str):
     is_positive = False
@@ -89,11 +96,17 @@ def randomTrainingExample4(C2I, ex_max_len):
 if __name__ == '__main__':
     import torch.utils.data
 
+    arguments = docopt(__doc__, version='Naval Fate 2.0')
+    language_number = arguments['<language_number>']
+
+    if (not language_number.isdigit()) or language_number < 0 or language_number > 3:
+        print("language_number must be a number between 1-3")
+    language_number = int(language_number)
+
     is_cuda = False
     embedding_dim = 50
     hidden_dim = 20
     learning_rate = 0.001
-    batch_size = 1
     epoches = 1
 
     vocab = "0123456789"
@@ -102,11 +115,31 @@ if __name__ == '__main__':
     for c in vocab:
         C2I[c] = len(C2I)
 
+    if language_number == 1:
+        train_num = 2500
+        test_num = 200
+        train_max_len = 200
+        test_max_len = 1000
+        func = randomTrainingExample2
+    else:
+        if language_number == 2:
+            train_num = 7500
+            test_num = 300
+            train_max_len = test_max_len = 1
+            func = randomTrainingExample3
+        else:
+            #if language_number == 3:
+            train_num = 7500
+            test_num = 300
+            train_max_len = 2500
+            test_max_len = 1000
+            func = randomTrainingExample4
+
     #res = [1 for s,is_pos in [randomTrainingExample2(C2I, 200) for i in range(1000)] if is_pos[0]==1]
     #print("pos/neg: {}/{}".format(len(res),1000-len(res)))
 
-    trainloader = Generator(7500, C2I, 2500, randomTrainingExample4)
-    testloader = Generator(300, C2I, 1000, randomTrainingExample4)
+    trainloader = Generator(train_num, C2I, train_max_len, func)
+    testloader = Generator(test_num, C2I, test_max_len, func)
 
     runner = ModelRunner(learning_rate, is_cuda, 50)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
