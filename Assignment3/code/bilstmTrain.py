@@ -59,7 +59,7 @@ if __name__ == '__main__':
     model_file = arguments['<modelFile>']
     dev_file = arguments.get('<devFile>', None)
     repr = arguments['<repr>']
-    is_ner = '--ner' in arguments
+    is_ner = arguments['--ner']
 
 
     legal_repr = ['a', 'b', 'c', 'd']

@@ -51,8 +51,6 @@ def randomTrainingExample3(C2I, ex_max_len):
                 prime_numbers.extend([int(l) for l in line.split()])
         prime_numbers = np.array(prime_numbers)
 
-    vocab = "0123456789"
-
     should_positive = random.uniform(0, 1) < 0.5
     rand_prime = random.choice(prime_numbers)
     if not should_positive:
@@ -66,6 +64,27 @@ def randomTrainingExample3(C2I, ex_max_len):
     category_tensor = torch.LongTensor([should_positive])
 
     return torch.unsqueeze(input_tensor, 0), category_tensor
+
+
+def randomTrainingExample4(C2I, ex_max_len):
+
+    ex_len = random.randint(1, ex_max_len)
+    should_positive = random.uniform(0, 1) < 0.5
+
+    if should_positive:
+        r = random.randint(0, ex_len/3) * 7
+    else:
+        r = random.randint(0,ex_len)
+        while r % 7 == 0:
+            r = random.randint(0,ex_len)
+    str_r = str(r)
+
+    input_tensor = torch.LongTensor([C2I[c] for c in str_r])
+    category_tensor = torch.LongTensor([should_positive])
+
+    return torch.unsqueeze(input_tensor, 0), category_tensor
+
+
 
 if __name__ == '__main__':
     import torch.utils.data
@@ -86,8 +105,8 @@ if __name__ == '__main__':
     #res = [1 for s,is_pos in [randomTrainingExample2(C2I, 200) for i in range(1000)] if is_pos[0]==1]
     #print("pos/neg: {}/{}".format(len(res),1000-len(res)))
 
-    trainloader = Generator(7500, C2I, 200, randomTrainingExample3)
-    testloader = Generator(300, C2I, 1000, randomTrainingExample3)
+    trainloader = Generator(7500, C2I, 2500, randomTrainingExample4)
+    testloader = Generator(300, C2I, 1000, randomTrainingExample4)
 
     runner = ModelRunner(learning_rate, is_cuda, 50)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
