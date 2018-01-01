@@ -187,13 +187,7 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
         #labels_tensor[:] = 0 # No real value
         raise
 
-    if calc_sub_word:
-        return W2I, T2I, F2I, inputs, labels
-    else:
-        if calc_characters:
-            return W2I, T2I, C2I, inputs, labels
-        else:
-            return W2I, T2I, inputs, labels
+    return W2I, T2I, F2I, C2I, inputs, labels
 
 
 def list_to_tuples(L, tup_size):
