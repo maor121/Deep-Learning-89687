@@ -1,7 +1,8 @@
-"""Usage: blistmTrain.py <repr> <trainFile> <modelFile> <devFile> [--ner]
+"""Usage: blistmTrain.py <repr> <trainFile> <modelFile> [<devFile>] [--ner] [--plot]
 
 -h --help    show this
--n           ner evaluation
+--ner        ner evaluation mode
+--plot       plot accuracy graph at the end, requires <devFile> to exist
 
 """
 from docopt import docopt
@@ -60,11 +61,16 @@ if __name__ == '__main__':
     dev_file = arguments.get('<devFile>', None)
     repr = arguments['<repr>']
     is_ner = arguments['--ner']
+    is_plot = arguments['--plot']
 
 
     legal_repr = ['a', 'b', 'c', 'd']
     if repr not in legal_repr:
         print("Illegal repr. Choose one of"+str(legal_repr))
+        exit()
+    if is_plot and not dev_file:
+        print("To set --plot you must supply a dev file")
+        exit()
 
     calc_sub_word = repr == 'c'
     calc_characters = repr in ['b', 'd']
@@ -79,7 +85,7 @@ if __name__ == '__main__':
     hidden_dim = T2I.len() * 6
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 1
+    epoches = 5
 
     if repr == 'a':
         repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
@@ -97,18 +103,22 @@ if __name__ == '__main__':
     trainloader = Generator(input_train, labels_train, batch_size=batch_size, sort_dim=sort_dim)
 
     # Eval
-    __, __, __, __, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
-                                                                 calc_characters=calc_characters,
-                                                                 calc_sub_word=calc_sub_word)
-    testloader = Generator(input_test, labels_test, batch_size=1000, sort_dim=sort_dim)
+    if dev_file is not None:
+        __, __, __, __, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
+                                                                     calc_characters=calc_characters,
+                                                                     calc_sub_word=calc_sub_word)
+        testloader = Generator(input_test, labels_test, batch_size=1000, sort_dim=sort_dim)
 
-    omit_o_tag = T2I.get_id('O') if is_ner else False
+        omit_o_tag = T2I.get_id('O') if is_ner else False
+    else:
+        omit_o_tag = testloader = None
 
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
-    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=False)
+    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=is_plot)
 
-    runner.eval(testloader, omit_tag_id=omit_o_tag, to_print=True)
+    if dev_file is not None:
+        runner.eval(testloader, omit_tag_id=omit_o_tag, to_print=True)
 
     pickle.dump((W2I, T2I, F2I, C2I, runner), open(model_file, 'w+'))
 

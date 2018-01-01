@@ -1,4 +1,4 @@
-"""Usage: blistmPerdict.py <repr> <modelFile> <inputFile> <outputFile> [options]
+"""Usage: blistmPerdict.py <repr> <modelFile> <inputFile> <outputFile>
 
 -h --help    show this
 -n           ner evaluation
