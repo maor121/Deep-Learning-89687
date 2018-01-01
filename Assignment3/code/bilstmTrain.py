@@ -82,7 +82,7 @@ if __name__ == '__main__':
     learning_rate = 0.001
     batch_size = 20
     embedding_dim = 50
-    hidden_dim = T2I.len() * 6
+    hidden_dim = T2I.len() * 4
     vocab_size = W2I.len()
     num_tags = T2I.len()
     epoches = 5
@@ -120,6 +120,7 @@ if __name__ == '__main__':
     if dev_file is not None:
         runner.eval(testloader, omit_tag_id=omit_o_tag, to_print=True)
 
+    print("Saving model... (If it's POS, this may take a while)")
     pickle.dump((W2I, T2I, F2I, C2I, runner), open(model_file, 'w+'))
 
     print(0)

@@ -184,8 +184,6 @@ def load_dataset(path, W2I=None, T2I=None, F2I=None, C2I=None,
 
     if not is_tagged:
         print "blind file detected!"
-        #labels_tensor[:] = 0 # No real value
-        raise
 
     return W2I, T2I, F2I, C2I, inputs, labels
 
