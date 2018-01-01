@@ -36,7 +36,7 @@ def randomTrainingExample2(C2I, ex_max_len):
     input_tensor = torch.LongTensor([C2I[c] for c in str])
     category_tensor = torch.LongTensor([is_positive])
 
-    return input_tensor, category_tensor
+    return torch.unsqueeze(input_tensor, 0), category_tensor
 
 if __name__ == '__main__':
     import torch.utils.data
@@ -60,7 +60,7 @@ if __name__ == '__main__':
     trainloader = Generator(2500, C2I, 200, randomTrainingExample2)
     testloader = Generator(200, C2I, 1000, randomTrainingExample2)
 
-    runner = ModelRunner(learning_rate, is_cuda)
+    runner = ModelRunner(learning_rate, is_cuda, 50)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
     runner.train(trainloader, epoches)
 

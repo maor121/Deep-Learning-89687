@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
     trainloader = Generator(input_train, labels_train, batch_size=batch_size, sort_dim=sort_dim)
 
-    runner = BlistmRunner(learning_rate, is_cuda)
+    runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
     runner.train(trainloader, epoches)
 

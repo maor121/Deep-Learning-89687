@@ -30,17 +30,21 @@ class LSTMTagger(nn.Module):
         if self.is_cuda:
             input = input.cuda()
 
+        input = torch.squeeze(input, 0)
+        sentence_len = sentence.shape[1]
+
         embeds = self.word_embeddings(input)
         lstm_out, hidden = self.lstm(
-            embeds.view(len(sentence), 1, -1))
-        out = self.hidden2tag(lstm_out.view(len(sentence), -1))
+            embeds.view(sentence_len, 1, -1))
+        out = self.hidden2tag(lstm_out.view(sentence_len, -1))
         return torch.unsqueeze(out[-1],0)
 
 
 class ModelRunner:
-    def __init__(self, learning_rate, is_cuda):
+    def __init__(self, learning_rate, is_cuda, eval_every_n_examples):
         self.learning_rate = learning_rate
         self.is_cuda = is_cuda
+        self.eval_every_n_examples = eval_every_n_examples
     def initialize_random(self, embedding_dim, hidden_dim, vocab_size):
         net = LSTMTagger(embedding_dim, hidden_dim, vocab_size, self.is_cuda)
         if (self.is_cuda):
@@ -55,7 +59,9 @@ class ModelRunner:
 
             start_e_t = time.time()
             running_loss = 0.0
-            for i, data in enumerate(trainloader, 0):
+            examples_trained = 0
+            batches_since_last_eval = 0
+            for data in trainloader:
                 start_b_t = time.time()
 
                 # get the inputs
@@ -78,11 +84,16 @@ class ModelRunner:
                 end_b_t = time.time()
 
                 # print statistics
-                running_loss += loss.data[0]
-                if i % 50 == 49:  # print every 2000 mini-batches
-                    print('[%d, %5d] loss: %.3f timer_per_batch: %.3f' %
-                          (epoch + 1, i + 1, running_loss / 50, (end_b_t - start_b_t)))
-                    running_loss = 0.0
+                batch_size = inputs.shape[0]
+                examples_trained += batch_size
+                batches_since_last_eval += 1
+                running_loss += loss.data[0] * (float(batch_size) / self.eval_every_n_examples)
+                if examples_trained > self.eval_every_n_examples:
+                    print('[%d] loss: %.3f timer_per_batch: %.3f' %
+                          (epoch + 1, running_loss, (end_b_t - start_b_t)))
+                    running_loss = 0
+                    batches_since_last_eval = 0
+                    examples_trained -= self.eval_every_n_examples
             end_e_t = time.time()
             print('epoch time: %.3f' % (end_e_t - start_e_t))
 
@@ -111,7 +122,7 @@ def randomTrainingExample(C2I, ex_max_len):
     category_tensor = torch.LongTensor([is_positive])
 
     #return torch.unsqueeze(input_tensor, 0), torch.unsqueeze(category_tensor, 0)
-    return input_tensor, category_tensor
+    return torch.unsqueeze(input_tensor,0), category_tensor
 
 class Generator(object):
     def __init__(self, len, C2I, ex_max_len, generateFunction):
@@ -156,7 +167,7 @@ if __name__ == '__main__':
     trainloader = Generator(2500, C2I, 200, randomTrainingExample)
     testloader = Generator(200, C2I, 10000, randomTrainingExample)
 
-    runner = ModelRunner(learning_rate, is_cuda)
+    runner = ModelRunner(learning_rate, is_cuda, 50)
     runner.initialize_random(embedding_dim, hidden_dim, vocab_size)
     runner.train(trainloader, epoches)
 
