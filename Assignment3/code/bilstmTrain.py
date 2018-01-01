@@ -30,9 +30,6 @@ class BiLSTMTagger(torch.nn.Module):
         hidden_layer_in_dim = hidden_dim*2
         self.out_layer = torch.nn.Linear(hidden_layer_in_dim, target_size)
 
-        if is_cuda:
-            self.cuda()
-
     def forward(self, input):
         e = self.repr_W(input)
 
@@ -45,6 +42,8 @@ from experiment import ModelRunner
 class BlistmRunner(ModelRunner):
     def initialize_random(self, repr_W, hidden_dim, target_size):
         net = BiLSTMTagger(repr_W, hidden_dim, target_size, self.is_cuda)
+        if self.is_cuda:
+            net.cuda()
 
         self.criterion = torch.nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
@@ -81,15 +80,18 @@ if __name__ == '__main__':
     num_tags = T2I.len()
     epoches = 5
 
-    if repr in ['a', 'c']:
+    if repr == 'a':
         repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
     else:
-        num_chars = C2I.len()
-        if repr == 'b':
-            repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
+        if repr == 'c':
+            repr_W = repr_w.repr_w_A_C(vocab_size+F2I.len(),embedding_dim, is_cuda)
         else:
-            #d
-            repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
+            num_chars = C2I.len()
+            if repr == 'b':
+                repr_W = repr_w.repr_w_B(num_chars, embedding_dim/2, embedding_dim, is_cuda)
+            else:
+                #d
+                repr_W = repr_w.repr_w_D(vocab_size, num_chars, embedding_dim, embedding_dim, embedding_dim, embedding_dim, is_cuda)
 
     trainloader = Generator(input_train, labels_train, batch_size=batch_size, sort_dim=sort_dim)
 

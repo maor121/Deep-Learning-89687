@@ -84,9 +84,6 @@ class repr_w_D(torch.nn.Module):
         self.linear_out = hidden_dim
         self.linear_layer = torch.nn.Linear(linear_in_dim, self.linear_out)
 
-        if is_cuda:
-            self.cuda()
-
     def forward(self, input):
         words = [i[0] for i in input]
         word_emb = self.repr_w_words(words)
