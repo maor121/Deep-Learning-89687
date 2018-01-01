@@ -1,6 +1,7 @@
-"""Usage: blistmTrain.py <repr> <trainFile> <modelFile> <devFile>
+"""Usage: blistmTrain.py <repr> <trainFile> <modelFile> <devFile> [--ner]
 
 -h --help    show this
+-n           ner evaluation
 
 """
 from docopt import docopt
@@ -58,6 +59,7 @@ if __name__ == '__main__':
     model_file = arguments['<modelFile>']
     dev_file = arguments.get('<devFile>', None)
     repr = arguments['<repr>']
+    is_ner = '--ner' in arguments
 
 
     legal_repr = ['a', 'b', 'c', 'd']
@@ -95,10 +97,12 @@ if __name__ == '__main__':
     __, __, __, __, input_test, labels_test = utils.load_dataset(dev_file, W2I=W2I, T2I=T2I, F2I=F2I, C2I=C2I,
                                                                  calc_characters=calc_characters,
                                                                  calc_sub_word=calc_sub_word)
-    testloader = Generator(input_test, labels_test, batch_size=batch_size, sort_dim=sort_dim)
+    testloader = Generator(input_test, labels_test, batch_size=1000, sort_dim=sort_dim)
+
+    omit_o_tag = 'O' if is_ner else False
 
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
-    runner.train(trainloader, epoches, testloader, omit_tag_id=None, plot=True)
+    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=True)
 
     print(0)
