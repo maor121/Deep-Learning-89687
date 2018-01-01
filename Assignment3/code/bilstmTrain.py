@@ -9,6 +9,7 @@ from docopt import docopt
 import torch
 
 import utils
+import pickle
 from batchers import Generator
 
 class BiLSTMTagger(torch.nn.Module):
@@ -78,7 +79,7 @@ if __name__ == '__main__':
     hidden_dim = T2I.len() * 6
     vocab_size = W2I.len()
     num_tags = T2I.len()
-    epoches = 5
+    epoches = 1
 
     if repr == 'a':
         repr_W = repr_w.repr_w_A_C(vocab_size, embedding_dim, is_cuda)
@@ -105,8 +106,10 @@ if __name__ == '__main__':
 
     runner = BlistmRunner(learning_rate, is_cuda, 500)
     runner.initialize_random(repr_W, hidden_dim, num_tags)
-    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=True)
+    runner.train(trainloader, epoches, testloader, omit_tag_id=omit_o_tag, plot=False)
 
     runner.eval(testloader, omit_tag_id=omit_o_tag, to_print=True)
+
+    pickle.dump((W2I, T2I, F2I, C2I, runner), open(model_file, 'w+'))
 
     print(0)

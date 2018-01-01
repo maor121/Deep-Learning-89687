@@ -5,6 +5,7 @@ import torch.nn.functional as F
 from torch import autograd
 from torch.autograd import Variable
 from torch.utils.data import TensorDataset
+import utils
 
 
 class LSTMTagger(nn.Module):
@@ -137,7 +138,36 @@ class ModelRunner:
             print('Accuracy of the network on the %d test words: %.3f %%' % (
                 total, 100.0 * correct / total))
         return acc
+    def write_prediction(self, testloader, T2I, test_org_file, prediction_out_filename):
+        I2T = utils.inverse_dict(T2I.S2I)
+        is_tagged_file=True
 
+        with open(test_org_file, 'rb') as source_file, \
+                open(prediction_out_filename, 'w+') as prediction_file:
+            print("Writing prediction to file {}".format(prediction_out_filename))
+
+            src_file_iter = iter(source_file)
+
+            self.net.train(False)  # Disable dropout during eval mode
+            for data in testloader:
+                input, __ = data
+                outputs = self.net(input)
+                _, predicted = torch.max(outputs.data, 1)
+                for t_id in predicted:
+                    line = src_file_iter.next()
+                    while len(line.strip()) == 0:
+                        prediction_file.write(line)
+                        line = src_file_iter.next()
+                    t = I2T[t_id]
+                    is_tagged_file, word, __ = utils.parse_word_tag(line.strip(), is_tagged_file, False, False)
+                    prediction_file.write(word+"\t"+t+"\n")
+            while True:
+                try:
+                    line = src_file_iter.next()
+                    assert len(line.strip()) == 0 # Should be only empty lines
+                    prediction_file.write(line)
+                except StopIteration:
+                    break
 
 def randomTrainingExample(C2I, ex_max_len):
     from gen_examples import gen_example
