@@ -50,6 +50,7 @@ if __name__ == '__main__':
     legal_repr = ['a', 'b', 'c', 'd']
     if repr not in legal_repr:
         print("Illegal repr. Choose one of"+str(legal_repr))
+        exit()
 
     calc_sub_word = repr == 'c'
     calc_characters = repr in ['b', 'd']
