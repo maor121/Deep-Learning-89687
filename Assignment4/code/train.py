@@ -5,19 +5,24 @@ from torch.autograd import Variable
 from model import SNLI_Tagger
 
 def convert_batch_to_embedding(batch, w2v):
-    # TODO
-    pass
+    batch_size = batch.shape[0]
+    sent_len = batch.shape[1]
+    embed_size = w2v.weight.data.shape[1]
+    embeddings = w2v(batch.view(-1))
+    return embeddings.view((batch_size,sent_len,embed_size))
 
 class ModelRunner:
     def __init__(self, learning_rate, is_cuda):
         self.learning_rate = learning_rate
         self.is_cuda = is_cuda
-    def initialize_random(self, w2v):
-        net = SNLI_Tagger()
+    def initialize_random(self, w2v, hidden_size):
+        self.w2v = w2v
+
+        embedding_size = w2v.weight.data.shape[1]
+
+        net = SNLI_Tagger(embedding_size, hidden_size)
         if (self.is_cuda):
             net.cuda()
-
-        self.w2v = w2v
 
         self.criterion = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.Adam(net.parameters(), lr=self.learning_rate)
@@ -33,13 +38,15 @@ class ModelRunner:
 
                 # get the inputs
                 sources, targets, labels = data
-                sources = convert_batch_to_embedding(sources, self.w2v)
-                targets = convert_batch_to_embedding(targets, self.w2v)
 
                 # Wrap tensors in variables
                 sources = Variable(sources)
                 targets = Variable(targets)
                 labels = Variable(labels)
+
+                # Convert to embeddings
+                sources = convert_batch_to_embedding(sources, self.w2v)
+                targets = convert_batch_to_embedding(targets, self.w2v)
 
                 if self.is_cuda:
                     sources = sources.cuda()
@@ -90,12 +97,14 @@ if __name__ == '__main__':
         "../out/entail-train.hdf5","../out/entail-val.hdf5","../out/glove.hdf5"
     )
 
-    vocab_size = len(w2v)
+    vocab_size = w2v.weight.data.shape[0]
     lr = 0.001
+    hidden_size = 200
+    epoches = 10
     is_cuda = True
 
     model_runner = ModelRunner(lr, is_cuda)
-    model_runner.initialize_random()
-
+    model_runner.initialize_random(w2v, hidden_size)
+    model_runner.train(train_batches, epoches)
 
     print(0)

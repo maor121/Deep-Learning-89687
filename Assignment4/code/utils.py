@@ -7,10 +7,17 @@ def load_data(h5py_train_filename, h5py_test_filename, hdpy_word2vec_filename):
     with h5py.File(hdpy_word2vec_filename, 'r') as word2vec_file:
         w2v = dict_to_tensor(word2vec_file, 'word_vecs')
 
+        vocab_size = len(w2v)
+        embedding_size = len(w2v[0])
+
+        w2v_emb = torch.nn.Embedding(vocab_size, embedding_size)
+        w2v_emb.weight.data.copy_(w2v)
+        w2v_emb.weight.requires_grad = False
+
         train_batches = load_batches(h5py_train_filename)
         test_batches = load_batches(h5py_test_filename)
 
-        return train_batches, test_batches, w2v
+        return train_batches, test_batches, w2v_emb
 
 
 def dict_to_tensor(h5py_file, key_name, reduct_one=False):
