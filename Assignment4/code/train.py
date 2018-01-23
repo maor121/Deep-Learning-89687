@@ -22,9 +22,10 @@ class ModelRunner:
 
         encoder_net = Encoder(embedding_size, hidden_size)
         attention_net = Attention(hidden_size, labels_count)
+        self.net = Sequential(*[encoder_net, attention_net])
         if (self.is_cuda):
-            encoder_net.cuda()
-            attention_net.cuda()
+            self.net = self.net.cuda()
+            self.w2v = self.w2v.cuda()
 
         self.criterion = nn.NLLLoss(size_average=True)
         #self.criterion = nn.CrossEntropyLoss()
@@ -32,7 +33,6 @@ class ModelRunner:
         self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate)
         self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate)
 
-        self.net = Sequential(*[encoder_net, attention_net])
     def train(self, trainloader, epoches, testloader=None):
         self.net.train(True)
         for epoch in range(epoches):  # loop over the dataset multiple times
@@ -50,14 +50,14 @@ class ModelRunner:
                 targets = Variable(targets)
                 labels = Variable(labels)
 
-                # Convert to embeddings
-                sources = convert_batch_to_embedding(sources, self.w2v)
-                targets = convert_batch_to_embedding(targets, self.w2v)
-
                 if self.is_cuda:
                     sources = sources.cuda()
                     targets = targets.cuda()
                     labels = labels.cuda()
+
+                # Convert to embeddings
+                sources = convert_batch_to_embedding(sources, self.w2v)
+                targets = convert_batch_to_embedding(targets, self.w2v)
 
                 # zero the parameter gradients
                 self.encoder_optimizer.zero_grad()
@@ -94,12 +94,12 @@ class ModelRunner:
             sources = Variable(sources, volatile=True)
             targets = Variable(targets, volatile=True)
             labels = Variable(labels)
-            sources = convert_batch_to_embedding(sources, self.w2v)
-            targets = convert_batch_to_embedding(targets, self.w2v)
             if self.is_cuda:
                 labels = labels.cuda()
                 sources = sources.cuda()
                 targets = targets.cuda()
+            sources = convert_batch_to_embedding(sources, self.w2v)
+            targets = convert_batch_to_embedding(targets, self.w2v)
             outputs = self.net((sources, targets))
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
@@ -116,8 +116,8 @@ if __name__ == '__main__':
 
     vocab_size = w2v.weight.data.shape[0]
     lr = 0.001
-    hidden_size = 200
-    epoches = 10
+    hidden_size = 300
+    epoches = 70
     labels_count = 3
     is_cuda = True
 
