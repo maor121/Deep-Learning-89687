@@ -13,21 +13,25 @@ def convert_batch_to_embedding(batch, w2v):
     return embeddings
 
 def penalize_sent_len(train_loss, dev_loss):
-    global last_train_loss, last_dev_loss
+    global last_train_loss, last_dev_loss, dropout_rate
     if 'last_train_loss' not in globals():
         last_train_loss = 999
     if 'last_dev_loss' not in globals():
         last_dev_loss = 999
+    if 'dropout_rate' not in globals():
+        dropout_rate = 0
 
     train_momentum = last_train_loss - train_loss
     dev_momentum = last_dev_loss - dev_loss
     last_train_loss = train_loss
     last_dev_loss = dev_loss
 
+    sent_len_penalty = 0
+    dropout_rate = dev_loss - train_loss
     if train_momentum > dev_momentum * 10:
         print("Possible overfitting: max_sent_len++")
-        return 1
-    return 0
+        sent_len_penalty = 1
+    return sent_len_penalty, dropout_rate
 
 
 class ModelRunner:
@@ -54,6 +58,7 @@ class ModelRunner:
 
     def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
         max_sent_len = initial_max_sent_len
+        train_dropout = 0
 
         self.net.train(True)
         for epoch in range(epoches):  # loop over the dataset multiple times
@@ -74,6 +79,8 @@ class ModelRunner:
                 trg_len = targets.shape[1]
                 if src_len > max_sent_len or trg_len > max_sent_len:
                     continue
+                if random.uniform(0,1) < train_dropout:
+                    continue # dropout training data to avoid overfitting
 
                 # Wrap tensors in variables
                 sources = Variable(sources)
@@ -112,7 +119,8 @@ class ModelRunner:
                   (epoch + 1, sent_trained_in_epoch + 1, train_loss,
                    (end_e_t - start_e_t)))
             dev_loss, __ = self.eval(testloader)
-            max_sent_len = max_sent_len + penalize_sent_len(train_loss, dev_loss)
+            pen_sent_len, train_dropout = penalize_sent_len(train_loss, dev_loss)
+            max_sent_len = max_sent_len + pen_sent_len
 
     def eval(self, testloader):
         self.net.train(False)  # Disable dropout during eval mode
