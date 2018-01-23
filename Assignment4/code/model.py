@@ -21,7 +21,7 @@ class Attention(nn.Module):
 
         self.final_layer = nn.Linear(self.hidden_size, self.labels_count)
 
-        self.log_prob = nn.LogSoftmax()
+        #self.log_prob = nn.LogSoftmax()
 
     def _create_mlp(self, in_dim, out_dim):
         # Paper defined all sub mlps to be of depth 2
@@ -87,12 +87,7 @@ class Attention(nn.Module):
 
         h = self.final_layer(h)
 
-        # print 'final layer'
-        # print h.data
-
-        log_prob = self.log_prob(h)
-
-        return log_prob
+        return h
 
 
 class Encoder(nn.Module):

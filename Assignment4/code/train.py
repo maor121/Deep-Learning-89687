@@ -12,6 +12,24 @@ def convert_batch_to_embedding(batch, w2v):
     embeddings = w2v(batch)
     return embeddings
 
+def penalize_sent_len(train_loss, dev_loss):
+    global last_train_loss, last_dev_loss
+    if 'last_train_loss' not in globals():
+        last_train_loss = 999
+    if 'last_dev_loss' not in globals():
+        last_dev_loss = 999
+
+    train_momentum = last_train_loss - train_loss
+    dev_momentum = last_dev_loss - dev_loss
+    last_train_loss = train_loss
+    last_dev_loss = dev_loss
+
+    if train_momentum > dev_momentum * 10:
+        print("Possible overfitting: max_sent_len++")
+        return 1
+    return 0
+
+
 class ModelRunner:
     def __init__(self, learning_rate, weight_decay, is_cuda):
         self.learning_rate = learning_rate
@@ -29,13 +47,14 @@ class ModelRunner:
             self.net = self.net.cuda()
             self.w2v = self.w2v.cuda()
 
-        self.criterion = nn.NLLLoss(size_average=True)
-        #self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(size_average=True)
 
         self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
         self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
 
-    def train(self, trainloader, epoches, testloader=None):
+    def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
+        max_sent_len = initial_max_sent_len
+
         self.net.train(True)
         for epoch in range(epoches):  # loop over the dataset multiple times
 
@@ -53,7 +72,7 @@ class ModelRunner:
 
                 src_len = sources.shape[1]
                 trg_len = targets.shape[1]
-                if src_len > 15 or trg_len > 15:
+                if src_len > max_sent_len or trg_len > max_sent_len:
                     continue
 
                 # Wrap tensors in variables
@@ -88,11 +107,12 @@ class ModelRunner:
 
                 sent_trained_in_epoch += 1
             end_e_t = time.time()
+            train_loss = running_loss / sent_trained_in_epoch
             print('[%d, %5d] loss: %.3f, epoch time: %.3f' %
-                  (epoch + 1, sent_trained_in_epoch + 1, running_loss / sent_trained_in_epoch,
+                  (epoch + 1, sent_trained_in_epoch + 1, train_loss,
                    (end_e_t - start_e_t)))
-            if testloader is not None:
-                self.eval(testloader)
+            dev_loss, __ = self.eval(testloader)
+            max_sent_len = max_sent_len + penalize_sent_len(train_loss, dev_loss)
 
     def eval(self, testloader):
         self.net.train(False)  # Disable dropout during eval mode
@@ -118,6 +138,7 @@ class ModelRunner:
             correct += (predicted == labels.data).sum()
         print('Dev: loss: %.3f, acc: %.1f %%' % (
             total_loss / len(testloader), 100.0 * correct / total))
+        return total_loss / len(testloader), 100.0 * correct / total
 
 
 if __name__ == '__main__':
