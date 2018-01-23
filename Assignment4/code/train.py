@@ -33,7 +33,7 @@ class ModelRunner:
         self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate)
 
         self.net = Sequential(*[encoder_net, attention_net])
-    def train(self, trainloader, epoches):
+    def train(self, trainloader, epoches, testloader=None):
         self.net.train(True)
         for epoch in range(epoches):  # loop over the dataset multiple times
 
@@ -74,27 +74,36 @@ class ModelRunner:
 
                 # print statistics
                 running_loss += loss.data[0]
-                if i % 50 == 49:  # print every 2000 mini-batches
-                    print('[%d, %5d] loss: %.3f timer_per_batch: %.3f' %
-                          (epoch + 1, i + 1, running_loss / 50, (end_b_t - start_b_t)))
-                    running_loss = 0.0
+                #if i % 5000 == 4999:  # print every 2000 mini-batches
+                #    print('[%d, %5d] loss: %.3f timer_per_batch: %.3f' %
+                #          (epoch + 1, i + 1, running_loss / 5000, (end_b_t - start_b_t)))
+                #    running_loss = 0.0
             end_e_t = time.time()
             print('epoch time: %.3f' % (end_e_t - start_e_t))
+            print('[%d, %5d] loss: %.3f' %
+                  (epoch + 1, i + 1, running_loss / i))
+            if testloader is not None:
+                self.eval(testloader)
 
     def eval(self, testloader):
         self.net.train(False)  # Disable dropout during eval mode
         correct = 0
         total = 0
         for i, data in enumerate(testloader):
-            features, labels = data
+            sources, targets, labels = data
+            sources = Variable(sources, volatile=True)
+            targets = Variable(targets, volatile=True)
+            labels = Variable(labels)
+            sources = convert_batch_to_embedding(sources, self.w2v)
+            targets = convert_batch_to_embedding(targets, self.w2v)
             if self.is_cuda:
                 labels = labels.cuda()
-            outputs = self.net(features)
+                sources = sources.cuda()
+                targets = targets.cuda()
+            outputs = self.net((sources, targets))
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
-            correct += (predicted == labels).sum()
-            if i % 10 == 0 and i > 0:
-                print("evaluated: "+str(i))
+            correct += (predicted == labels.data).sum()
         print('Accuracy of the network on the %d test words: %d %%' % (
             total, 100 * correct / total))
 
@@ -114,6 +123,6 @@ if __name__ == '__main__':
 
     model_runner = ModelRunner(lr, is_cuda)
     model_runner.initialize_random(w2v, hidden_size, labels_count)
-    model_runner.train(train_batches, epoches)
+    model_runner.train(train_batches, epoches, test_batches)
 
     print(0)
