@@ -37,7 +37,7 @@ class Attention(nn.Module):
 
     def forward(self, *input):
         """Implement intra sentence attention"""
-        sources_lin, targets_lin = input
+        sources_lin, targets_lin = input[0]
         source_sent_len = sources_lin.shape[1]
         targets_sent_len = targets_lin.shape[1] # Hypothesis
 
@@ -68,8 +68,8 @@ class Attention(nn.Module):
         # batch_size x len2 x (hidden_size x 2)
 
         '''sum'''
-        g1 = self.mlp_g(sent1_combine.view(-1, 2 * self.hidden_size))
-        g2 = self.mlp_g(sent2_combine.view(-1, 2 * self.hidden_size))
+        g1 = self.g_mlp(sent1_combine.view(-1, 2 * self.hidden_size))
+        g2 = self.g_mlp(sent2_combine.view(-1, 2 * self.hidden_size))
         g1 = g1.view(-1, source_sent_len, self.hidden_size)
         # batch_size x len1 x hidden_size
         g2 = g2.view(-1, targets_sent_len, self.hidden_size)
@@ -82,10 +82,10 @@ class Attention(nn.Module):
 
         input_combine = torch.cat((sent1_output, sent2_output), 1)
         # batch_size x (2 * hidden_size)
-        h = self.mlp_h(input_combine)
+        h = self.h_mlp(input_combine)
         # batch_size * hidden_size
 
-        h = self.final_linear(h)
+        h = self.final_layer(h)
 
         # print 'final layer'
         # print h.data
@@ -106,7 +106,7 @@ class Encoder(nn.Module):
             self.embedding_size, self.hidden_size)
 
     def forward(self, *input):
-        sources, targets = input
+        sources, targets = input[0]
 
         # reduce embedding dimesions to 200 as per the paper
         sources_lin = self.encoder_linear(sources)
