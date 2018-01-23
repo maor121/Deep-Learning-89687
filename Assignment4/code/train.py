@@ -3,6 +3,7 @@ import torch
 from torch import nn
 from torch.autograd import Variable
 from torch.nn import Sequential
+import random
 
 from model import Encoder, Attention
 
@@ -38,13 +39,22 @@ class ModelRunner:
         self.net.train(True)
         for epoch in range(epoches):  # loop over the dataset multiple times
 
+            # Shuffle train batches
+            random.shuffle(trainloader)
+
             start_e_t = time.time()
             running_loss = 0.0
+            sent_trained_in_epoch = 0
             for i, data in enumerate(trainloader, 0):
                 start_b_t = time.time()
 
                 # get the inputs
                 sources, targets, labels = data
+
+                src_len = sources.shape[1]
+                trg_len = targets.shape[1]
+                if src_len > 15 or trg_len > 15:
+                    continue
 
                 # Wrap tensors in variables
                 sources = Variable(sources)
@@ -75,14 +85,12 @@ class ModelRunner:
 
                 # print statistics
                 running_loss += loss.data[0]
-                #if i % 5000 == 4999:  # print every 2000 mini-batches
-                #    print('[%d, %5d] loss: %.3f timer_per_batch: %.3f' %
-                #          (epoch + 1, i + 1, running_loss / 5000, (end_b_t - start_b_t)))
-                #    running_loss = 0.0
+
+                sent_trained_in_epoch += 1
             end_e_t = time.time()
-            print('epoch time: %.3f' % (end_e_t - start_e_t))
-            print('[%d, %5d] loss: %.3f' %
-                  (epoch + 1, i + 1, running_loss / i))
+            print('[%d, %5d] loss: %.3f, epoch time: %.3f' %
+                  (epoch + 1, sent_trained_in_epoch + 1, running_loss / sent_trained_in_epoch,
+                   (end_e_t - start_e_t)))
             if testloader is not None:
                 self.eval(testloader)
 
@@ -90,10 +98,11 @@ class ModelRunner:
         self.net.train(False)  # Disable dropout during eval mode
         correct = 0
         total = 0
+        total_loss = 0.0
         for i, data in enumerate(testloader):
             sources, targets, labels = data
-            sources = Variable(sources, volatile=True)
-            targets = Variable(targets, volatile=True)
+            sources = Variable(sources)
+            targets = Variable(targets)
             labels = Variable(labels)
             if self.is_cuda:
                 labels = labels.cuda()
@@ -102,11 +111,13 @@ class ModelRunner:
             sources = convert_batch_to_embedding(sources, self.w2v)
             targets = convert_batch_to_embedding(targets, self.w2v)
             outputs = self.net((sources, targets))
+            loss = self.criterion(outputs, labels)
+            total_loss += loss.data[0]
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels.data).sum()
-        print('Accuracy of the network on the %d test words: %d %%' % (
-            total, 100 * correct / total))
+        print('Dev: loss: %.3f, acc: %.1f %%' % (
+            total_loss / len(testloader), 100.0 * correct / total))
 
 
 if __name__ == '__main__':
