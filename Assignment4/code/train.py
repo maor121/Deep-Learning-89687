@@ -12,8 +12,9 @@ def convert_batch_to_embedding(batch, w2v):
     return embeddings
 
 class ModelRunner:
-    def __init__(self, learning_rate, is_cuda):
+    def __init__(self, learning_rate, weight_decay, is_cuda):
         self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
         self.is_cuda = is_cuda
     def initialize_random(self, w2v, hidden_size, labels_count):
         self.w2v = w2v
@@ -30,8 +31,8 @@ class ModelRunner:
         self.criterion = nn.NLLLoss(size_average=True)
         #self.criterion = nn.CrossEntropyLoss()
 
-        self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate)
-        self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate)
+        self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
 
     def train(self, trainloader, epoches, testloader=None):
         self.net.train(True)
@@ -115,13 +116,14 @@ if __name__ == '__main__':
     )
 
     vocab_size = w2v.weight.data.shape[0]
-    lr = 0.001
+    lr = 0.01
+    weight_decay = 5e-5
     hidden_size = 300
     epoches = 70
     labels_count = 3
     is_cuda = True
 
-    model_runner = ModelRunner(lr, is_cuda)
+    model_runner = ModelRunner(lr, weight_decay, is_cuda)
     model_runner.initialize_random(w2v, hidden_size, labels_count)
     model_runner.train(train_batches, epoches, test_batches)
 
