@@ -1,0 +1,43 @@
+kept batch norm
+removed data dropout
+const sent size 10
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:60: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:66: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+[1,  3196] loss: 0.947, epoch time: 13.258
+Dev: loss: 1.094, acc: 55.8 %
+[2,  3196] loss: 0.772, epoch time: 13.437
+Dev: loss: 0.802, acc: 68.8 %
+[3,  3196] loss: 0.683, epoch time: 13.414
+Dev: loss: 0.756, acc: 71.6 %
+[4,  3196] loss: 0.633, epoch time: 13.468
+Dev: loss: 0.734, acc: 73.5 %
+[5,  3196] loss: 0.596, epoch time: 13.520
+Dev: loss: 0.703, acc: 73.7 %
+[6,  3196] loss: 0.566, epoch time: 13.433
+Dev: loss: 0.750, acc: 74.1 %
+[7,  3196] loss: 0.543, epoch time: 13.484
+Dev: loss: 0.727, acc: 75.0 %
+[8,  3196] loss: 0.521, epoch time: 13.496
+Dev: loss: 0.730, acc: 75.3 %
+[9,  3196] loss: 0.500, epoch time: 13.477
+Dev: loss: 0.720, acc: 75.3 %
+[10,  3196] loss: 0.483, epoch time: 13.451
+Dev: loss: 0.723, acc: 75.3 %
+[11,  3196] loss: 0.463, epoch time: 13.416
+Dev: loss: 0.727, acc: 75.2 %
+[12,  3196] loss: 0.446, epoch time: 13.488
+Dev: loss: 0.689, acc: 76.2 %
+[13,  3196] loss: 0.429, epoch time: 13.485
+Dev: loss: 0.724, acc: 75.5 %
+[14,  3196] loss: 0.412, epoch time: 13.479
+Dev: loss: 0.730, acc: 75.5 %
+[15,  3196] loss: 0.395, epoch time: 13.447
+Dev: loss: 0.769, acc: 74.3 %
+[16,  3196] loss: 0.378, epoch time: 13.473
+Dev: loss: 0.749, acc: 75.4 %

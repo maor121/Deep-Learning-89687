@@ -77,10 +77,13 @@ class ModelRunner:
 
                 src_len = sources.shape[1]
                 trg_len = targets.shape[1]
+                batch_size = sources.shape[0]
+                if batch_size == 1:
+                    continue # Skip batches of size 1 for now
                 if src_len > max_sent_len or trg_len > max_sent_len:
                     continue
-                if random.uniform(0,1) < train_dropout:
-                    continue # dropout training data to avoid overfitting
+                #if random.uniform(0,1) < 0.2:
+                #    continue # dropout training data to avoid overfitting
 
                 # Wrap tensors in variables
                 sources = Variable(sources)
@@ -119,8 +122,8 @@ class ModelRunner:
                   (epoch + 1, sent_trained_in_epoch + 1, train_loss,
                    (end_e_t - start_e_t)))
             dev_loss, __ = self.eval(testloader)
-            pen_sent_len, train_dropout = penalize_sent_len(train_loss, dev_loss)
-            max_sent_len = max_sent_len + pen_sent_len
+            #pen_sent_len, train_dropout = penalize_sent_len(train_loss, dev_loss)
+            #max_sent_len = max_sent_len + pen_sent_len
 
     def eval(self, testloader):
         self.net.train(False)  # Disable dropout during eval mode

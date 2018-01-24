@@ -27,12 +27,15 @@ class Attention(nn.Module):
         # Paper defined all sub mlps to be of depth 2
         # Relu between layers, except the final_layer
         l = []
-        l.append(nn.Dropout(p=0.15))
+        l.append(nn.Dropout(p=0.2))
         l.append(nn.Linear(in_dim, out_dim))
+        l.append(nn.BatchNorm1d(out_dim))
         l.append(nn.ReLU())
-        l.append(nn.Dropout(p=0.15))
+        l.append(nn.Dropout(p=0.2))
         l.append(nn.Linear(out_dim, out_dim))
+        l.append(nn.BatchNorm1d(out_dim))
         l.append(nn.ReLU())
+
         return nn.Sequential(*l)  # * used to unpack list
 
     def forward(self, *input):
@@ -97,14 +100,34 @@ class Encoder(nn.Module):
         self.hidden_size = hidden_size
         self.embedding_size = embedding_size
 
-        self.encoder_linear = Linear(
-            self.embedding_size, self.hidden_size)
+        l = []
+        l.append(Linear(self.embedding_size, self.hidden_size))
+        l.append(ReshapeLayer(-1, self.hidden_size))
+        l.append(nn.BatchNorm1d(self.hidden_size))
+        l.append(nn.ReLU())
+
+        self.encoder_net = nn.Sequential(*l)
 
     def forward(self, *input):
         sources, targets = input[0]
 
-        # reduce embedding dimesions to 200 as per the paper
-        sources_lin = self.encoder_linear(sources)
-        targets_lin = self.encoder_linear(targets)
+        batch_size = sources.shape[0]
+        src_len = sources.shape[1]
+        targ_len = targets.shape[1]
+        sources_lin = self.encoder_net(sources)
+        targets_lin = self.encoder_net(targets)
+
+        sources_lin = sources_lin.view(batch_size, src_len, -1)
+        targets_lin = targets_lin.view(batch_size, targ_len, -1)
 
         return sources_lin, targets_lin
+
+
+class ReshapeLayer(nn.Module):
+    """Reshape layer"""
+    def __init__(self, *args):
+        super(ReshapeLayer, self).__init__()
+        self.shape = args
+
+    def forward(self, x):
+        return x.view(self.shape)
