@@ -2,10 +2,9 @@ import time
 import torch
 from torch import nn
 from torch.autograd import Variable
-from torch.nn import Sequential
 import random
 
-from model import Encoder, Attention
+from model import SNLI_Tagger
 
 
 def convert_batch_to_embedding(batch, w2v):
@@ -45,24 +44,21 @@ class ModelRunner:
 
         embedding_size = w2v.weight.data.shape[1]
 
-        #encoder_net = Encoder(embedding_size, hidden_size)
-        attention_net = Attention(embedding_size, hidden_size, labels_count)
-        self.net = attention_net #Sequential(*[encoder_net, attention_net])
+        self.net = SNLI_Tagger(embedding_size, hidden_size, labels_count)
         if (self.is_cuda):
             self.net = self.net.cuda()
             self.w2v = self.w2v.cuda()
 
         self.criterion = nn.CrossEntropyLoss(size_average=True)
 
-        #self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=self.lr_decay)
-        self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
+        self.optimizer = torch.optim.Adagrad(self.net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
 
     def train(self, trainloader, epoches, testloader, initial_max_sent_len=15):
         max_sent_len = initial_max_sent_len
         train_dropout = 0
 
         self.net.train(True)
-        for epoch in range(epoches):  # loop over the dataset multiple times
+        for epoch in range(epoches):
 
             # Shuffle train batches
             random.shuffle(trainloader)
@@ -80,7 +76,7 @@ class ModelRunner:
                 trg_len = targets.shape[1]
                 batch_size = sources.shape[0]
                 if batch_size == 1:
-                    continue # Skip batches of size 1 for now
+                    continue # Skip batches of size 1, gives error for BatchNorm1d
                 if src_len > max_sent_len or trg_len > max_sent_len:
                     continue
                 #if random.uniform(0,1) < 0.2:
@@ -101,15 +97,13 @@ class ModelRunner:
                 targets = convert_batch_to_embedding(targets, self.w2v)
 
                 # zero the parameter gradients
-                #self.encoder_optimizer.zero_grad()
-                self.attention_optimizer.zero_grad()
+                self.optimizer.zero_grad()
 
                 # forward + backward + optimize
                 outputs = self.net((sources, targets))
                 loss = self.criterion(outputs, labels)
                 loss.backward()
-                #self.encoder_optimizer.step()
-                self.attention_optimizer.step()
+                self.optimizer.step()
 
                 end_b_t = time.time()
 

@@ -3,98 +3,109 @@ from torch import nn
 import torch.nn.functional as F
 from torch.nn import Linear
 
+
 class SNLI_Tagger(nn.Module):
-    def __init__(self, embedding_size, hidden_size):
+    def __init__(self, embedding_size, hidden_size, labels_count):
         super(SNLI_Tagger, self).__init__()
 
+        encoder_net = Encode(embedding_size, hidden_size)
+        #intra_attention = IntraAttend(hidden_size)
+        attention = Attend(hidden_size)
+        compare = Compare(hidden_size)
+        aggregate = Aggregate(hidden_size, labels_count)
 
-class Attention(nn.Module):
-    def __init__(self, embedding_size, hidden_size, labels_count):
-        super(Attention, self).__init__()
+        #self.net = Sequential(*[encoder_net, intra_attention, attention, compare, aggregate])
+        self.net = nn.Sequential(*[encoder_net, attention, compare, aggregate])
 
-        self.encoder_net = Encoder(embedding_size, hidden_size)
+    def forward(self, *input):
+        return self.net(input[0])
+
+
+class Aggregate(nn.Module):
+    """Paper: Section 3.3"""
+    def __init__(self, hidden_size, labels_count):
+        super(Aggregate, self).__init__()
 
         self.hidden_size = hidden_size
         self.labels_count = labels_count
 
-        self.f_mlp = self._create_mlp(self.hidden_size, self.hidden_size)
-        self.g_mlp = self._create_mlp(2 * self.hidden_size, self.hidden_size)
-        self.h_mlp = self._create_mlp(2 * self.hidden_size, self.hidden_size)
+        h_mlp = create_2_linear_batchnorm_relu_dropout(2 * self.hidden_size, self.hidden_size)
+        final_layer = nn.Linear(self.hidden_size, self.labels_count)
 
-        self.final_layer = nn.Linear(self.hidden_size, self.labels_count)
-
-    def _create_mlp(self, in_dim, out_dim):
-        # Paper defined all sub mlps to be of depth 2
-        # Relu between layers, except the final_layer
-        l = []
-        l.append(nn.Dropout(p=0.2))
-        l.append(nn.Linear(in_dim, out_dim))
-        l.append(nn.BatchNorm1d(out_dim))
-        l.append(nn.ReLU())
-        l.append(nn.Dropout(p=0.2))
-        l.append(nn.Linear(out_dim, out_dim))
-        l.append(nn.BatchNorm1d(out_dim))
-        l.append(nn.ReLU())
-
-        return nn.Sequential(*l)  # * used to unpack list
+        self.net = nn.Sequential(*[h_mlp, final_layer])
 
     def forward(self, *input):
-        """Implement intra sentence attention"""
-        sources_lin, targets_lin = self.encoder_net(input[0])
+        v1i, v2j = input[0]
+
+        v1 = torch.squeeze(torch.sum(v1i, 1), 1)
+        v2 = torch.squeeze(torch.sum(v2j, 1), 1)
+
+        y_kova = self.net(torch.cat((v1, v2), 1))
+
+        return y_kova
+
+
+class Compare(nn.Module):
+    """Paper: Section 3.2"""
+    def __init__(self, hidden_size):
+        super(Compare,self).__init__()
+
+        self.hidden_size = hidden_size
+        self.g_mlp = create_2_linear_batchnorm_relu_dropout(2 * self.hidden_size, self.hidden_size)
+
+    def forward(self, *input):
+        alpha, beta = input[0]
+
+        source_sent_len = alpha.shape[1]
+        targets_sent_len = beta.shape[1]  # Hypothesis
+
+        v1i = self.g_mlp(alpha.view(-1, 2 * self.hidden_size)).view(-1, source_sent_len, self.hidden_size)
+        v2j = self.g_mlp(beta.view(-1, 2 * self.hidden_size)).view(-1, targets_sent_len, self.hidden_size)
+
+        return v1i, v2j
+
+
+class Attend(nn.Module):
+    """Paper: Section 3.1"""
+    def __init__(self, hidden_size):
+        super(Attend, self).__init__()
+        self.hidden_size = hidden_size
+
+        self.f_mlp = create_2_linear_batchnorm_relu_dropout(hidden_size, hidden_size)
+
+    def _forward_F_tag(self, a, b):
+        a_sent_len = a.shape[1]
+        b_sent_len = b.shape[1]
+        a_f_mlp = self.f_mlp(a.view(-1, self.hidden_size)).view(-1, a_sent_len, self.hidden_size)
+        b_f_mlp = self.f_mlp(b.view(-1, self.hidden_size)).view(-1, b_sent_len, self.hidden_size)
+
+        return torch.bmm(a_f_mlp, torch.transpose(b_f_mlp, 1, 2))
+
+    def forward(self, *input):
+        sources_lin, targets_lin =input[0]
         source_sent_len = sources_lin.shape[1]
-        targets_sent_len = targets_lin.shape[1] # Hypothesis
+        targets_sent_len = targets_lin.shape[1]  # Hypothesis
 
+        # Attention weights
+        Eij = self._forward_F_tag(sources_lin, targets_lin)
+        Eji = torch.transpose(Eij.contiguous(), 1, 2).contiguous() # transpose(Eij)
 
-        f1 = self.f_mlp(sources_lin.view(-1, self.hidden_size))
-        f2 = self.f_mlp(targets_lin.view(-1, self.hidden_size))
+        # Normalize attention weights
+        Eij_softmax = F.softmax(Eij.view(-1, targets_sent_len), dim=1).view(-1, source_sent_len, targets_sent_len)
+        Eji_softmax = F.softmax(Eji.view(-1, source_sent_len), dim=1).view(-1, targets_sent_len, source_sent_len)
 
-        f1 = f1.view(-1, source_sent_len, self.hidden_size)
-        f2 = f2.view(-1, targets_sent_len, self.hidden_size)
+        #Attention part!
 
-        score1 = torch.bmm(f1, torch.transpose(f2, 1, 2))
-        # e_{ij} batch_size x len1 x len2
-        prob1 = F.softmax(score1.view(-1, targets_sent_len),dim=1).view(-1, source_sent_len, targets_sent_len)
-        # batch_size x len1 x len2
+        # beta = subphrase of target which is softly aligned to source (source: paper)
+        beta = torch.cat((targets_lin, torch.bmm(Eji_softmax, sources_lin)), 2)
+        # alpha = subphrase of source which is softly aligned to target (source: paper)
+        alpha = torch.cat((sources_lin, torch.bmm(Eij_softmax, targets_lin)), 2)
 
-        score2 = torch.transpose(score1.contiguous(), 1, 2)
-        score2 = score2.contiguous()
-        # e_{ji} batch_size x len2 x len1
-        prob2 = F.softmax(score2.view(-1, source_sent_len),dim=1).view(-1, targets_sent_len, source_sent_len)
-        # batch_size x len2 x len1
+        return alpha, beta
 
-        sent1_combine = torch.cat(
-            (sources_lin, torch.bmm(prob1, targets_lin)), 2)
-        # batch_size x len1 x (hidden_size x 2)
-        sent2_combine = torch.cat(
-            (targets_lin, torch.bmm(prob2, sources_lin)), 2)
-        # batch_size x len2 x (hidden_size x 2)
-
-
-        g1 = self.g_mlp(sent1_combine.view(-1, 2 * self.hidden_size))
-        g2 = self.g_mlp(sent2_combine.view(-1, 2 * self.hidden_size))
-        g1 = g1.view(-1, source_sent_len, self.hidden_size)
-        # batch_size x len1 x hidden_size
-        g2 = g2.view(-1, targets_sent_len, self.hidden_size)
-        # batch_size x len2 x hidden_size
-
-        sent1_output = torch.sum(g1, 1)  # batch_size x 1 x hidden_size
-        sent1_output = torch.squeeze(sent1_output, 1)
-        sent2_output = torch.sum(g2, 1)  # batch_size x 1 x hidden_size
-        sent2_output = torch.squeeze(sent2_output, 1)
-
-        input_combine = torch.cat((sent1_output, sent2_output), 1)
-        # batch_size x (2 * hidden_size)
-        h = self.h_mlp(input_combine)
-        # batch_size * hidden_size
-
-        h = self.final_layer(h)
-
-        return h
-
-
-class Encoder(nn.Module):
+class Encode(nn.Module):
     def __init__(self, embedding_size, hidden_size):
-        super(Encoder, self).__init__()
+        super(Encode, self).__init__()
 
         self.hidden_size = hidden_size
         self.embedding_size = embedding_size
@@ -130,3 +141,19 @@ class ReshapeLayer(nn.Module):
 
     def forward(self, x):
         return x.view(self.shape)
+
+
+def create_2_linear_batchnorm_relu_dropout(in_dim, out_dim):
+    # Paper defined all sub mlps to be of depth 2
+    # Relu between layers, except the final_layer
+    l = []
+    l.append(nn.Dropout(p=0.2))
+    l.append(nn.Linear(in_dim, out_dim))
+    l.append(nn.BatchNorm1d(out_dim))
+    l.append(nn.ReLU())
+    l.append(nn.Dropout(p=0.2))
+    l.append(nn.Linear(out_dim, out_dim))
+    l.append(nn.BatchNorm1d(out_dim))
+    l.append(nn.ReLU())
+
+    return nn.Sequential(*l)
