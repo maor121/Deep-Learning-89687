@@ -32,7 +32,7 @@ class Aggregate(nn.Module):
         h_mlp = create_2_linear_batchnorm_relu_dropout(2 * self.hidden_size, self.hidden_size)
         final_layer = nn.Linear(self.hidden_size, self.labels_count)
 
-        self.net = nn.Sequential(*[h_mlp, final_layer])
+        self.H = nn.Sequential(*[h_mlp, final_layer])
 
     def forward(self, *input):
         v1i, v2j = input[0]
@@ -40,7 +40,7 @@ class Aggregate(nn.Module):
         v1 = torch.squeeze(torch.sum(v1i, 1), 1)
         v2 = torch.squeeze(torch.sum(v2j, 1), 1)
 
-        y_kova = self.net(torch.cat((v1, v2), 1))
+        y_kova = self.H(torch.cat((v1, v2), 1))
 
         return y_kova
 
@@ -51,7 +51,7 @@ class Compare(nn.Module):
         super(Compare,self).__init__()
 
         self.hidden_size = hidden_size
-        self.g_mlp = create_2_linear_batchnorm_relu_dropout(2 * self.hidden_size, self.hidden_size)
+        self.G = create_2_linear_batchnorm_relu_dropout(2 * self.hidden_size, self.hidden_size)
 
     def forward(self, *input):
         alpha, beta = input[0]
@@ -59,8 +59,8 @@ class Compare(nn.Module):
         source_sent_len = alpha.shape[1]
         targets_sent_len = beta.shape[1]  # Hypothesis
 
-        v1i = self.g_mlp(alpha.view(-1, 2 * self.hidden_size)).view(-1, source_sent_len, self.hidden_size)
-        v2j = self.g_mlp(beta.view(-1, 2 * self.hidden_size)).view(-1, targets_sent_len, self.hidden_size)
+        v1i = self.G(alpha.view(-1, 2 * self.hidden_size)).view(-1, source_sent_len, self.hidden_size)
+        v2j = self.G(beta.view(-1, 2 * self.hidden_size)).view(-1, targets_sent_len, self.hidden_size)
 
         return v1i, v2j
 
