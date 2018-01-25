@@ -57,7 +57,7 @@ class ModelRunner:
         self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=self.lr_decay)
         self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
 
-    def train(self, trainloader, epoches, testloader, initial_max_sent_len=15):
+    def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
         max_sent_len = initial_max_sent_len
         train_dropout = 0
 
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     vocab_size = w2v.weight.data.shape[0]
     lr = 0.01
     weight_decay = 5e-5
-    lr_decay = 5e-3
+    lr_decay = 0
     hidden_size = 300
     epoches = 70
     labels_count = 3

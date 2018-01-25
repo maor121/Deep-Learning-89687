@@ -44,7 +44,6 @@ class Attention(nn.Module):
         source_sent_len = sources_lin.shape[1]
         targets_sent_len = targets_lin.shape[1] # Hypothesis
 
-        '''attend'''
 
         f1 = self.f_mlp(sources_lin.view(-1, self.hidden_size))
         f2 = self.f_mlp(targets_lin.view(-1, self.hidden_size))
@@ -54,13 +53,13 @@ class Attention(nn.Module):
 
         score1 = torch.bmm(f1, torch.transpose(f2, 1, 2))
         # e_{ij} batch_size x len1 x len2
-        prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+        prob1 = F.softmax(score1.view(-1, targets_sent_len),dim=1).view(-1, source_sent_len, targets_sent_len)
         # batch_size x len1 x len2
 
         score2 = torch.transpose(score1.contiguous(), 1, 2)
         score2 = score2.contiguous()
         # e_{ji} batch_size x len2 x len1
-        prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+        prob2 = F.softmax(score2.view(-1, source_sent_len),dim=1).view(-1, targets_sent_len, source_sent_len)
         # batch_size x len2 x len1
 
         sent1_combine = torch.cat(
@@ -70,7 +69,7 @@ class Attention(nn.Module):
             (targets_lin, torch.bmm(prob2, sources_lin)), 2)
         # batch_size x len2 x (hidden_size x 2)
 
-        '''sum'''
+
         g1 = self.g_mlp(sent1_combine.view(-1, 2 * self.hidden_size))
         g2 = self.g_mlp(sent2_combine.view(-1, 2 * self.hidden_size))
         g1 = g1.view(-1, source_sent_len, self.hidden_size)
