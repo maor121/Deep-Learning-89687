@@ -13,6 +13,10 @@ def load_data(h5py_train_filename, h5py_test_filename, hdpy_word2vec_filename):
         w2v_emb = torch.nn.Embedding(vocab_size, embedding_size)
         w2v_emb.weight.data.copy_(w2v)
         w2v_emb.weight.requires_grad = False
+        # Per paper : normalize each word embed to have l2 norm of 1
+        # embeddings were normalized in preprocessing stage
+        #norm = w2v_emb.weight.data.norm(p=2, dim=1, keepdim=True)
+        #w2v_emb.weight.data = w2v_emb.weight.data.div(norm)
 
         train_batches = load_batches(h5py_train_filename)
         test_batches = load_batches(h5py_test_filename)

@@ -9,8 +9,10 @@ class SNLI_Tagger(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, hidden_size, labels_count):
+    def __init__(self, embedding_size, hidden_size, labels_count):
         super(Attention, self).__init__()
+
+        self.encoder_net = Encoder(embedding_size, hidden_size)
 
         self.hidden_size = hidden_size
         self.labels_count = labels_count
@@ -20,8 +22,6 @@ class Attention(nn.Module):
         self.h_mlp = self._create_mlp(2 * self.hidden_size, self.hidden_size)
 
         self.final_layer = nn.Linear(self.hidden_size, self.labels_count)
-
-        #self.log_prob = nn.LogSoftmax()
 
     def _create_mlp(self, in_dim, out_dim):
         # Paper defined all sub mlps to be of depth 2
@@ -40,7 +40,7 @@ class Attention(nn.Module):
 
     def forward(self, *input):
         """Implement intra sentence attention"""
-        sources_lin, targets_lin = input[0]
+        sources_lin, targets_lin = self.encoder_net(input[0])
         source_sent_len = sources_lin.shape[1]
         targets_sent_len = targets_lin.shape[1] # Hypothesis
 
