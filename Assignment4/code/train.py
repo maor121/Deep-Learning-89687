@@ -35,8 +35,9 @@ def penalize_sent_len(train_loss, dev_loss):
 
 
 class ModelRunner:
-    def __init__(self, learning_rate, weight_decay, is_cuda):
+    def __init__(self, learning_rate, weight_decay, lr_decay, is_cuda):
         self.learning_rate = learning_rate
+        self.lr_decay = lr_decay
         self.weight_decay = weight_decay
         self.is_cuda = is_cuda
     def initialize_random(self, w2v, hidden_size, labels_count):
@@ -53,10 +54,10 @@ class ModelRunner:
 
         self.criterion = nn.CrossEntropyLoss(size_average=True)
 
-        self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
-        self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay)
+        self.encoder_optimizer = torch.optim.Adagrad(encoder_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=self.lr_decay)
+        self.attention_optimizer = torch.optim.Adagrad(attention_net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
 
-    def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
+    def train(self, trainloader, epoches, testloader, initial_max_sent_len=15):
         max_sent_len = initial_max_sent_len
         train_dropout = 0
 
@@ -161,12 +162,13 @@ if __name__ == '__main__':
     vocab_size = w2v.weight.data.shape[0]
     lr = 0.01
     weight_decay = 5e-5
+    lr_decay = 5e-3
     hidden_size = 300
     epoches = 70
     labels_count = 3
     is_cuda = True
 
-    model_runner = ModelRunner(lr, weight_decay, is_cuda)
+    model_runner = ModelRunner(lr, weight_decay, lr_decay, is_cuda)
     model_runner.initialize_random(w2v, hidden_size, labels_count)
     model_runner.train(train_batches, epoches, test_batches)
 
