@@ -1,0 +1,72 @@
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+[1,  3196] loss: 1.087, epoch time: 13.785
+Dev: loss: 1.671, acc: 44.2 %
+[2,  3196] loss: 0.906, epoch time: 9.985
+Dev: loss: 0.916, acc: 59.8 %
+[3,  3196] loss: 0.824, epoch time: 10.009
+Dev: loss: 0.894, acc: 60.8 %
+[4,  3196] loss: 0.783, epoch time: 9.911
+Dev: loss: 0.913, acc: 62.7 %
+[5,  3196] loss: 0.750, epoch time: 10.064
+Dev: loss: 0.871, acc: 65.7 %
+[6,  3196] loss: 0.722, epoch time: 10.014
+Dev: loss: 0.857, acc: 66.5 %
+[7,  3196] loss: 0.699, epoch time: 9.988
+Dev: loss: 0.832, acc: 67.2 %
+[8,  3196] loss: 0.677, epoch time: 10.041
+Dev: loss: 0.845, acc: 67.0 %
+[9,  3196] loss: 0.660, epoch time: 10.055
+Dev: loss: 0.845, acc: 68.5 %
+[10,  3196] loss: 0.644, epoch time: 10.210
+Dev: loss: 0.828, acc: 68.2 %
+[11,  3196] loss: 0.631, epoch time: 9.918
+Dev: loss: 0.817, acc: 68.5 %
+[12,  3196] loss: 0.619, epoch time: 9.861
+Dev: loss: 0.844, acc: 69.0 %
+[13,  3196] loss: 0.608, epoch time: 9.884
+Dev: loss: 0.817, acc: 69.5 %
+[14,  3196] loss: 0.598, epoch time: 9.905
+Dev: loss: 0.853, acc: 69.2 %
+[15,  3196] loss: 0.588, epoch time: 9.749
+Dev: loss: 0.881, acc: 68.3 %
+[16,  3196] loss: 0.579, epoch time: 9.872
+Dev: loss: 0.857, acc: 69.8 %
+[17,  3196] loss: 0.572, epoch time: 9.946
+Dev: loss: 0.848, acc: 68.9 %
+[18,  3196] loss: 0.563, epoch time: 9.940
+Dev: loss: 0.864, acc: 69.0 %
+[19,  3196] loss: 0.555, epoch time: 9.826
+Dev: loss: 0.881, acc: 68.8 %
+[20,  3196] loss: 0.548, epoch time: 9.904
+Dev: loss: 0.841, acc: 70.0 %
+[21,  3196] loss: 0.542, epoch time: 10.090
+Dev: loss: 0.843, acc: 69.8 %
+[22,  3196] loss: 0.535, epoch time: 9.789
+Dev: loss: 0.853, acc: 70.4 %
+[23,  3196] loss: 0.528, epoch time: 9.869
+Dev: loss: 0.848, acc: 70.6 %
+[24,  3196] loss: 0.522, epoch time: 9.945
+Dev: loss: 0.880, acc: 69.7 %
+[25,  3196] loss: 0.516, epoch time: 9.900
+Dev: loss: 0.883, acc: 70.2 %
+[26,  3196] loss: 0.510, epoch time: 10.023
+Dev: loss: 0.893, acc: 70.2 %
+[27,  3196] loss: 0.504, epoch time: 9.974
+Dev: loss: 0.851, acc: 71.1 %
+[28,  3196] loss: 0.498, epoch time: 9.983
+Dev: loss: 0.857, acc: 70.0 %
+[29,  3196] loss: 0.493, epoch time: 10.056
+Dev: loss: 0.951, acc: 69.3 %
+[30,  3196] loss: 0.487, epoch time: 9.961
+Dev: loss: 0.879, acc: 70.4 %
+[31,  3196] loss: 0.482, epoch time: 10.186
+Dev: loss: 0.919, acc: 69.8 %
+[32,  3196] loss: 0.476, epoch time: 9.850
+Dev: loss: 0.960, acc: 69.0 %
+[33,  3196] loss: 0.471, epoch time: 9.952
+Dev: loss: 0.949, acc: 69.7 %
+[34,  3196] loss: 0.465, epoch time: 10.028
+Dev: loss: 0.950, acc: 69.7 %
+[35,  3196] loss: 0.461, epoch time: 10.050

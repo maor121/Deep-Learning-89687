@@ -53,7 +53,7 @@ class ModelRunner:
 
         self.optimizer = torch.optim.Adagrad(self.net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
 
-    def train(self, trainloader, epoches, testloader, initial_max_sent_len=15):
+    def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
         max_sent_len = initial_max_sent_len
         train_dropout = 0
 
