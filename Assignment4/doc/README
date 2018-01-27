@@ -1,0 +1,36 @@
+* Dependencies
+- numpy
+- matplotlib
+- h5py
+- pytorch
+
+* Preprocessing stage (linux):
+
+$code_folder - code folder located in project folder
+
+1. First, copy all input files to $code_folder/pre
+    Needed files:
+        - snli_1.0_train.txt
+        - snli_1.0_train.jsonl
+        - snli_1.0_test.txt
+        - snli_1.0_test.jsonl
+        - snli_1.0_dev.txt
+        - snli_1.0_dev.jsonl
+        - glove.6B.300d.txt    (or another 300D embedding files. for example: other glove 300D versions exist)
+
+2. Run commands:
+    (run from virtual env containing dependencies)
+
+    cd $code_folder
+    mkdir -p out
+    python process-snli.py --data_folder . --out_folder ./out/
+    python preprocess.py --srcfile ./out/src-train.txt --targetfile ./out/targ-train.txt --labelfile ./out/label-train.txt --srctestfile ./out/src-test.txt --targettestfile ./out/targ-test.txt --labeltestfile ./out/label-test.txt --srcvalfile ./out/src-dev.txt --targetvalfile ./out/targ-dev.txt --labelvalfile ./out/label-dev.txt --outputfile ./out/entail --glove ./glove.6B.300d.txt
+    python get_pretrain_vecs.py --glove ./glove.6B.300d.txt --outputfile ./out/glove.hdf5 --dictionary ./out/entail.word.dict
+
+    NOTE: line before last, contains glove.6B.300d.txt as glove file name. change to another name if you have different file.
+
+* Running the model:
+    (run from virtual env containing dependencies)
+
+    cd $code_folder
+    python train.py pre/out/entail-train.hdf5 ../out/entail-val.hdf5 ../out/glove.hdf5
