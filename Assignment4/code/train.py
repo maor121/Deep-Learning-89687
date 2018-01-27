@@ -170,8 +170,16 @@ class ModelRunner:
 
 if __name__ == '__main__':
     import utils
+    import sys
+    if len(sys.argv) != 4:
+        print 'Wrong num of arguments. Try:\npython train.py train.hdf5 dev.hdf5 glove300d.hdf5'
+
+    train_filename = sys.argv[1]
+    dev_filename = sys.argv[2]
+    w2v_filename = sys.argv[3]
+
     train_batches, test_batches, w2v = utils.load_data(
-        "../out/entail-train.hdf5","../out/entail-val.hdf5","../out/glove.hdf5"
+        train_filename, dev_filename, w2v_filename
     )
 
     vocab_size = w2v.weight.data.shape[0]
@@ -179,7 +187,7 @@ if __name__ == '__main__':
     weight_decay = 1e-6
     lr_decay = 0
     hidden_size = 300
-    epoches = 10
+    epoches = 17
     labels_count = 3
     is_cuda = True
 
