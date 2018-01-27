@@ -1,0 +1,22 @@
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+==============================
+Begin training of model
+816603 parameters
+==============================
+[1, 11647] epoch time: 79.345
+train_loss: 0.924, train_acc: 62.073
+dev_loss: 1.096, dev_acc: 61.041
+[2, 11647] epoch time: 83.776
+train_loss: 0.656, train_acc: 72.968
+dev_loss: 0.654, dev_acc: 74.078
+[3, 11647] epoch time: 82.815
+train_loss: 0.591, train_acc: 76.222
+dev_loss: 0.610, dev_acc: 76.821
+[4, 11647] epoch time: 82.909
+train_loss: 0.561, train_acc: 77.706
+dev_loss: 0.580, dev_acc: 78.264
+[5, 11647] epoch time: 82.716
+train_loss: 0.544, train_acc: 78.498
+dev_loss: 0.570, dev_acc: 78.793

@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     vocab_size = w2v.weight.data.shape[0]
     lr = 0.01
-    weight_decay = 5e-5
+    weight_decay = 1e-6
     lr_decay = 0
     hidden_size = 300
     epoches = 10
