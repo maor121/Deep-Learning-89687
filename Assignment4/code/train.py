@@ -11,6 +11,7 @@ def convert_batch_to_embedding(batch, w2v):
     embeddings = w2v(batch)
     return embeddings
 
+
 def penalize_sent_len(train_loss, dev_loss):
     global last_train_loss, last_dev_loss, dropout_rate
     if 'last_train_loss' not in globals():
@@ -33,6 +34,17 @@ def penalize_sent_len(train_loss, dev_loss):
     return sent_len_penalty, dropout_rate
 
 
+def get_n_params(model):
+    """Count parameters of a model"""
+    pp=0
+    for p in list(model.parameters()):
+        nn=1
+        for s in list(p.size()):
+            nn = nn*s
+        pp += nn
+    return pp
+
+
 class ModelRunner:
     def __init__(self, learning_rate, weight_decay, lr_decay, is_cuda):
         self.learning_rate = learning_rate
@@ -53,7 +65,12 @@ class ModelRunner:
 
         self.optimizer = torch.optim.Adagrad(self.net.parameters(), lr=self.learning_rate, weight_decay=self.weight_decay, lr_decay=lr_decay)
 
-    def train(self, trainloader, epoches, testloader, initial_max_sent_len=10):
+    def train(self, trainloader, epoches, testloader, initial_max_sent_len=16):
+        print '=' * 30
+        print "Begin training of model"
+        print str(get_n_params(self.net)) + ' parameters'
+        print '=' * 30
+
         max_sent_len = initial_max_sent_len
         train_dropout = 0
 
@@ -111,12 +128,18 @@ class ModelRunner:
                 running_loss += loss.data[0]
 
                 sent_trained_in_epoch += 1
+
+            train_loss, train_acc = self.eval(trainloader)
+            dev_loss, dev_acc = self.eval(testloader)
+
             end_e_t = time.time()
-            train_loss = running_loss / sent_trained_in_epoch
-            print('[%d, %5d] loss: %.3f, epoch time: %.3f' %
-                  (epoch + 1, sent_trained_in_epoch + 1, train_loss,
-                   (end_e_t - start_e_t)))
-            dev_loss, __ = self.eval(testloader)
+
+            print('[%d, %5d] epoch time: %.3f\ntrain_loss: %.3f, train_acc: %.3f\ndev_loss: %.3f, dev_acc: %.3f' %
+                  (epoch + 1, sent_trained_in_epoch + 1,
+                   (end_e_t - start_e_t),
+                   train_loss, train_acc,
+                   dev_loss, dev_acc
+                   ))
             #pen_sent_len, train_dropout = penalize_sent_len(train_loss, dev_loss)
             #max_sent_len = max_sent_len + pen_sent_len
 
@@ -142,8 +165,6 @@ class ModelRunner:
             _, predicted = torch.max(outputs.data, 1)
             total += labels.size(0)
             correct += (predicted == labels.data).sum()
-        print('Dev: loss: %.3f, acc: %.1f %%' % (
-            total_loss / len(testloader), 100.0 * correct / total))
         return total_loss / len(testloader), 100.0 * correct / total
 
 
@@ -158,7 +179,7 @@ if __name__ == '__main__':
     weight_decay = 5e-5
     lr_decay = 0
     hidden_size = 300
-    epoches = 70
+    epoches = 10
     labels_count = 3
     is_cuda = True
 

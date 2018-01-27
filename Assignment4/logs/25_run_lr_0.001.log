@@ -1,0 +1,466 @@
+sent len = 10
+lr = 0.001
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+[1,  3196] loss: 1.056, epoch time: 13.943
+Dev: loss: 1.168, acc: 44.1 %
+[2,  3196] loss: 0.882, epoch time: 13.748
+Dev: loss: 1.025, acc: 59.7 %
+[3,  3196] loss: 0.808, epoch time: 13.673
+Dev: loss: 0.921, acc: 63.0 %
+[4,  3196] loss: 0.766, epoch time: 13.819
+Dev: loss: 0.805, acc: 67.0 %
+[5,  3196] loss: 0.736, epoch time: 13.754
+Dev: loss: 0.784, acc: 68.0 %
+[6,  3196] loss: 0.711, epoch time: 13.750
+Dev: loss: 0.788, acc: 68.0 %
+[7,  3196] loss: 0.692, epoch time: 13.757
+Dev: loss: 0.766, acc: 69.5 %
+[8,  3196] loss: 0.676, epoch time: 13.710
+Dev: loss: 0.778, acc: 69.6 %
+[9,  3196] loss: 0.663, epoch time: 13.693
+Dev: loss: 0.777, acc: 69.9 %
+[10,  3196] loss: 0.651, epoch time: 13.651
+Dev: loss: 0.740, acc: 71.0 %
+[11,  3196] loss: 0.641, epoch time: 13.675
+Dev: loss: 0.729, acc: 71.1 %
+[12,  3196] loss: 0.632, epoch time: 13.724
+Dev: loss: 0.758, acc: 71.0 %
+[13,  3196] loss: 0.624, epoch time: 13.979
+Dev: loss: 0.784, acc: 70.4 %
+[14,  3196] loss: 0.617, epoch time: 13.909
+Dev: loss: 0.769, acc: 71.0 %
+[15,  3196] loss: 0.609, epoch time: 14.156
+Dev: loss: 0.768, acc: 71.4 %
+[16,  3196] loss: 0.603, epoch time: 13.695
+Dev: loss: 0.778, acc: 70.6 %
+[17,  3196] loss: 0.597, epoch time: 13.988
+Dev: loss: 0.749, acc: 71.9 %
+[18,  3196] loss: 0.591, epoch time: 14.049
+Dev: loss: 0.746, acc: 72.3 %
+[19,  3196] loss: 0.586, epoch time: 13.956
+Dev: loss: 0.752, acc: 72.1 %
+[20,  3196] loss: 0.580, epoch time: 14.761
+Dev: loss: 0.780, acc: 71.7 %
+[21,  3196] loss: 0.575, epoch time: 14.446
+Dev: loss: 0.783, acc: 71.7 %
+[22,  3196] loss: 0.570, epoch time: 14.024
+Dev: loss: 0.818, acc: 71.1 %
+[23,  3196] loss: 0.566, epoch time: 14.149
+Dev: loss: 0.774, acc: 72.2 %
+[24,  3196] loss: 0.561, epoch time: 14.625
+Dev: loss: 0.773, acc: 72.3 %
+[25,  3196] loss: 0.557, epoch time: 14.672
+Dev: loss: 0.797, acc: 71.9 %
+[26,  3196] loss: 0.552, epoch time: 14.669
+Dev: loss: 0.763, acc: 72.3 %
+[27,  3196] loss: 0.548, epoch time: 14.639
+Dev: loss: 0.770, acc: 72.3 %
+[28,  3196] loss: 0.544, epoch time: 14.665
+Dev: loss: 0.794, acc: 72.0 %
+[29,  3196] loss: 0.540, epoch time: 14.667
+Dev: loss: 0.789, acc: 72.1 %
+[30,  3196] loss: 0.536, epoch time: 14.653
+Dev: loss: 0.800, acc: 72.2 %
+[31,  3196] loss: 0.533, epoch time: 14.655
+Dev: loss: 0.787, acc: 72.5 %
+[32,  3196] loss: 0.529, epoch time: 14.654
+Dev: loss: 0.822, acc: 71.8 %
+[33,  3196] loss: 0.525, epoch time: 14.658
+Dev: loss: 0.830, acc: 71.8 %
+[34,  3196] loss: 0.522, epoch time: 14.642
+Dev: loss: 0.782, acc: 72.8 %
+[35,  3196] loss: 0.518, epoch time: 14.679
+Dev: loss: 0.783, acc: 72.6 %
+[36,  3196] loss: 0.515, epoch time: 14.675
+Dev: loss: 0.788, acc: 72.7 %
+[37,  3196] loss: 0.511, epoch time: 14.650
+Dev: loss: 0.824, acc: 72.4 %
+[38,  3196] loss: 0.508, epoch time: 14.728
+Dev: loss: 0.813, acc: 72.7 %
+[39,  3196] loss: 0.505, epoch time: 14.670
+Dev: loss: 0.801, acc: 72.5 %
+[40,  3196] loss: 0.501, epoch time: 14.661
+Dev: loss: 0.809, acc: 72.7 %
+[41,  3196] loss: 0.498, epoch time: 14.663
+Dev: loss: 0.795, acc: 72.8 %
+[42,  3196] loss: 0.495, epoch time: 14.659
+Dev: loss: 0.794, acc: 72.8 %
+[43,  3196] loss: 0.492, epoch time: 14.690
+Dev: loss: 0.797, acc: 73.0 %
+[44,  3196] loss: 0.489, epoch time: 14.649
+Dev: loss: 0.802, acc: 73.0 %
+[45,  3196] loss: 0.486, epoch time: 14.679
+Dev: loss: 0.807, acc: 72.5 %
+[46,  3196] loss: 0.483, epoch time: 14.672
+Dev: loss: 0.817, acc: 72.5 %
+[47,  3196] loss: 0.480, epoch time: 14.373
+Dev: loss: 0.833, acc: 72.7 %
+[48,  3196] loss: 0.478, epoch time: 14.218
+Dev: loss: 0.813, acc: 72.8 %
+[49,  3196] loss: 0.475, epoch time: 14.511
+Dev: loss: 0.821, acc: 72.8 %
+[50,  3196] loss: 0.472, epoch time: 14.898
+Dev: loss: 0.815, acc: 72.5 %
+[51,  3196] loss: 0.469, epoch time: 14.034
+Dev: loss: 0.849, acc: 72.4 %
+[52,  3196] loss: 0.467, epoch time: 14.237
+Dev: loss: 0.836, acc: 72.6 %
+[53,  3196] loss: 0.464, epoch time: 14.070
+Dev: loss: 0.823, acc: 73.0 %
+[54,  3196] loss: 0.461, epoch time: 15.023
+Dev: loss: 0.827, acc: 72.8 %
+[55,  3196] loss: 0.459, epoch time: 14.665
+Dev: loss: 0.840, acc: 73.1 %
+[56,  3196] loss: 0.456, epoch time: 15.254
+Dev: loss: 0.821, acc: 73.2 %
+[57,  3196] loss: 0.453, epoch time: 15.200
+Dev: loss: 0.844, acc: 73.0 %
+[58,  3196] loss: 0.450, epoch time: 14.884
+Dev: loss: 0.837, acc: 72.6 %
+[59,  3196] loss: 0.448, epoch time: 14.997
+Dev: loss: 0.850, acc: 72.9 %
+[60,  3196] loss: 0.445, epoch time: 15.163
+Dev: loss: 0.843, acc: 72.9 %
+[61,  3196] loss: 0.442, epoch time: 14.791
+Dev: loss: 0.852, acc: 72.6 %
+[62,  3196] loss: 0.440, epoch time: 14.820
+Dev: loss: 0.845, acc: 72.8 %
+[63,  3196] loss: 0.438, epoch time: 14.684
+Dev: loss: 0.925, acc: 71.4 %
+[64,  3196] loss: 0.435, epoch time: 14.712
+Dev: loss: 0.880, acc: 72.8 %
+[65,  3196] loss: 0.433, epoch time: 14.677
+Dev: loss: 0.862, acc: 73.2 %
+[66,  3196] loss: 0.430, epoch time: 14.663
+Dev: loss: 0.872, acc: 72.5 %
+[67,  3196] loss: 0.428, epoch time: 14.684
+Dev: loss: 0.890, acc: 72.9 %
+[68,  3196] loss: 0.425, epoch time: 14.679
+Dev: loss: 0.883, acc: 72.6 %
+[69,  3196] loss: 0.423, epoch time: 14.646
+Dev: loss: 0.903, acc: 72.0 %
+[70,  3196] loss: 0.421, epoch time: 14.671
+Dev: loss: 0.871, acc: 73.0 %
+[71,  3196] loss: 0.418, epoch time: 14.690
+Dev: loss: 0.893, acc: 72.8 %
+[72,  3196] loss: 0.416, epoch time: 14.645
+Dev: loss: 0.891, acc: 72.9 %
+[73,  3196] loss: 0.414, epoch time: 14.674
+Dev: loss: 0.897, acc: 72.9 %
+[74,  3196] loss: 0.411, epoch time: 14.712
+Dev: loss: 0.887, acc: 72.9 %
+[75,  3196] loss: 0.409, epoch time: 14.663
+Dev: loss: 0.914, acc: 72.3 %
+[76,  3196] loss: 0.406, epoch time: 14.641
+Dev: loss: 0.916, acc: 73.1 %
+[77,  3196] loss: 0.405, epoch time: 14.671
+Dev: loss: 0.920, acc: 72.6 %
+[78,  3196] loss: 0.402, epoch time: 14.670
+Dev: loss: 0.901, acc: 72.9 %
+[79,  3196] loss: 0.399, epoch time: 14.667
+Dev: loss: 0.922, acc: 72.5 %
+[80,  3196] loss: 0.398, epoch time: 14.663
+Dev: loss: 0.952, acc: 72.2 %
+[81,  3196] loss: 0.395, epoch time: 14.942
+Dev: loss: 0.925, acc: 73.0 %
+[82,  3196] loss: 0.393, epoch time: 14.342
+Dev: loss: 0.916, acc: 73.2 %
+[83,  3196] loss: 0.391, epoch time: 14.385
+Dev: loss: 0.933, acc: 72.6 %
+[84,  3196] loss: 0.389, epoch time: 14.335
+Dev: loss: 0.920, acc: 72.6 %
+[85,  3196] loss: 0.386, epoch time: 14.347
+Dev: loss: 0.927, acc: 72.8 %
+[86,  3196] loss: 0.384, epoch time: 14.382
+Dev: loss: 0.958, acc: 72.1 %
+[87,  3196] loss: 0.382, epoch time: 14.355
+Dev: loss: 0.962, acc: 72.4 %
+[88,  3196] loss: 0.380, epoch time: 14.379
+Dev: loss: 0.947, acc: 72.4 %
+[89,  3196] loss: 0.378, epoch time: 14.360
+Dev: loss: 0.943, acc: 73.0 %
+[90,  3196] loss: 0.375, epoch time: 14.378
+Dev: loss: 0.955, acc: 72.5 %
+[91,  3196] loss: 0.373, epoch time: 14.379
+Dev: loss: 0.982, acc: 72.3 %
+[92,  3196] loss: 0.371, epoch time: 14.376
+Dev: loss: 0.995, acc: 71.8 %
+[93,  3196] loss: 0.369, epoch time: 14.366
+Dev: loss: 1.005, acc: 71.9 %
+[94,  3196] loss: 0.367, epoch time: 14.355
+Dev: loss: 0.989, acc: 72.1 %
+[95,  3196] loss: 0.365, epoch time: 14.318
+Dev: loss: 0.998, acc: 71.9 %
+[96,  3196] loss: 0.363, epoch time: 14.396
+Dev: loss: 1.037, acc: 71.7 %
+[97,  3196] loss: 0.361, epoch time: 14.334
+Dev: loss: 1.048, acc: 71.5 %
+[98,  3196] loss: 0.359, epoch time: 14.344
+Dev: loss: 0.994, acc: 72.4 %
+[99,  3196] loss: 0.357, epoch time: 14.386
+Dev: loss: 0.995, acc: 72.7 %
+[100,  3196] loss: 0.354, epoch time: 14.366
+Dev: loss: 1.010, acc: 72.0 %
+[101,  3196] loss: 0.353, epoch time: 14.366
+Dev: loss: 1.059, acc: 71.7 %
+[102,  3196] loss: 0.351, epoch time: 14.361
+Dev: loss: 1.029, acc: 72.1 %
+[103,  3196] loss: 0.349, epoch time: 14.341
+Dev: loss: 1.018, acc: 72.2 %
+[104,  3196] loss: 0.347, epoch time: 14.338
+Dev: loss: 1.023, acc: 72.7 %
+[105,  3196] loss: 0.345, epoch time: 14.377
+Dev: loss: 1.042, acc: 72.1 %
+[106,  3196] loss: 0.343, epoch time: 14.379
+Dev: loss: 1.054, acc: 72.4 %
+[107,  3196] loss: 0.341, epoch time: 14.338
+Dev: loss: 1.048, acc: 72.1 %
+[108,  3196] loss: 0.339, epoch time: 14.355
+Dev: loss: 1.027, acc: 72.4 %
+[109,  3196] loss: 0.337, epoch time: 14.398
+Dev: loss: 1.050, acc: 72.2 %
+[110,  3196] loss: 0.335, epoch time: 14.384
+Dev: loss: 1.062, acc: 71.6 %
+[111,  3196] loss: 0.333, epoch time: 14.369
+Dev: loss: 1.083, acc: 72.2 %
+[112,  3196] loss: 0.331, epoch time: 14.327
+Dev: loss: 1.102, acc: 72.2 %
+[113,  3196] loss: 0.330, epoch time: 14.350
+Dev: loss: 1.112, acc: 71.7 %
+[114,  3196] loss: 0.327, epoch time: 14.358
+Dev: loss: 1.123, acc: 71.2 %
+[115,  3196] loss: 0.325, epoch time: 14.360
+Dev: loss: 1.104, acc: 71.5 %
+[116,  3196] loss: 0.324, epoch time: 14.389
+Dev: loss: 1.098, acc: 72.3 %
+[117,  3196] loss: 0.321, epoch time: 14.370
+Dev: loss: 1.095, acc: 71.8 %
+[118,  3196] loss: 0.320, epoch time: 14.385
+Dev: loss: 1.186, acc: 70.8 %
+[119,  3196] loss: 0.318, epoch time: 14.470
+Dev: loss: 1.128, acc: 71.7 %
+[120,  3196] loss: 0.316, epoch time: 14.372
+Dev: loss: 1.130, acc: 71.8 %
+[121,  3196] loss: 0.314, epoch time: 14.324
+Dev: loss: 1.189, acc: 71.0 %
+[122,  3196] loss: 0.312, epoch time: 14.398
+Dev: loss: 1.174, acc: 71.5 %
+[123,  3196] loss: 0.310, epoch time: 14.418
+Dev: loss: 1.156, acc: 71.7 %
+[124,  3196] loss: 0.309, epoch time: 14.384
+Dev: loss: 1.173, acc: 71.6 %
+[125,  3196] loss: 0.307, epoch time: 14.369
+Dev: loss: 1.169, acc: 71.9 %
+[126,  3196] loss: 0.305, epoch time: 14.394
+Dev: loss: 1.220, acc: 71.2 %
+[127,  3196] loss: 0.303, epoch time: 14.321
+Dev: loss: 1.245, acc: 70.9 %
+[128,  3196] loss: 0.302, epoch time: 14.348
+Dev: loss: 1.199, acc: 71.3 %
+[129,  3196] loss: 0.300, epoch time: 14.368
+Dev: loss: 1.238, acc: 71.0 %
+[130,  3196] loss: 0.298, epoch time: 14.363
+Dev: loss: 1.248, acc: 71.1 %
+[131,  3196] loss: 0.296, epoch time: 14.344
+Dev: loss: 1.224, acc: 71.2 %
+[132,  3196] loss: 0.294, epoch time: 14.335
+Dev: loss: 1.235, acc: 71.4 %
+[133,  3196] loss: 0.293, epoch time: 14.401
+Dev: loss: 1.274, acc: 70.9 %
+[134,  3196] loss: 0.291, epoch time: 14.374
+Dev: loss: 1.249, acc: 71.0 %
+[135,  3196] loss: 0.289, epoch time: 14.357
+Dev: loss: 1.268, acc: 71.0 %
+[136,  3196] loss: 0.287, epoch time: 14.374
+Dev: loss: 1.250, acc: 71.2 %
+[137,  3196] loss: 0.286, epoch time: 14.341
+Dev: loss: 1.263, acc: 71.5 %
+[138,  3196] loss: 0.284, epoch time: 14.419
+Dev: loss: 1.296, acc: 71.1 %
+[139,  3196] loss: 0.282, epoch time: 14.387
+Dev: loss: 1.291, acc: 71.2 %
+[140,  3196] loss: 0.280, epoch time: 14.364
+Dev: loss: 1.293, acc: 70.9 %
+[141,  3196] loss: 0.279, epoch time: 14.356
+Dev: loss: 1.352, acc: 70.7 %
+[142,  3196] loss: 0.277, epoch time: 14.401
+Dev: loss: 1.336, acc: 70.2 %
+[143,  3196] loss: 0.275, epoch time: 14.369
+Dev: loss: 1.390, acc: 70.5 %
+[144,  3196] loss: 0.273, epoch time: 14.340
+Dev: loss: 1.336, acc: 70.6 %
+[145,  3196] loss: 0.272, epoch time: 14.362
+Dev: loss: 1.370, acc: 70.8 %
+[146,  3196] loss: 0.270, epoch time: 14.341
+Dev: loss: 1.334, acc: 70.9 %
+[147,  3196] loss: 0.269, epoch time: 14.382
+Dev: loss: 1.392, acc: 70.7 %
+[148,  3196] loss: 0.267, epoch time: 14.368
+Dev: loss: 1.399, acc: 70.4 %
+[149,  3196] loss: 0.265, epoch time: 14.379
+Dev: loss: 1.476, acc: 70.0 %
+[150,  3196] loss: 0.264, epoch time: 14.388
+Dev: loss: 1.443, acc: 70.7 %
+[151,  3196] loss: 0.262, epoch time: 14.367
+Dev: loss: 1.401, acc: 70.8 %
+[152,  3196] loss: 0.260, epoch time: 14.380
+Dev: loss: 1.408, acc: 71.0 %
+[153,  3196] loss: 0.258, epoch time: 14.357
+Dev: loss: 1.428, acc: 70.8 %
+[154,  3196] loss: 0.257, epoch time: 14.393
+Dev: loss: 1.378, acc: 71.4 %
+[155,  3196] loss: 0.255, epoch time: 14.349
+Dev: loss: 1.397, acc: 71.3 %
+[156,  3196] loss: 0.254, epoch time: 14.366
+Dev: loss: 1.464, acc: 70.2 %
+[157,  3196] loss: 0.252, epoch time: 14.408
+Dev: loss: 1.450, acc: 70.7 %
+[158,  3196] loss: 0.251, epoch time: 14.361
+Dev: loss: 1.448, acc: 70.9 %
+[159,  3196] loss: 0.249, epoch time: 14.360
+Dev: loss: 1.466, acc: 70.5 %
+[160,  3196] loss: 0.248, epoch time: 14.364
+Dev: loss: 1.508, acc: 70.4 %
+[161,  3196] loss: 0.246, epoch time: 14.346
+Dev: loss: 1.477, acc: 70.4 %
+[162,  3196] loss: 0.244, epoch time: 14.349
+Dev: loss: 1.576, acc: 70.2 %
+[163,  3196] loss: 0.242, epoch time: 14.385
+Dev: loss: 1.523, acc: 70.7 %
+[164,  3196] loss: 0.241, epoch time: 14.338
+Dev: loss: 1.494, acc: 70.3 %
+[165,  3196] loss: 0.240, epoch time: 14.360
+Dev: loss: 1.505, acc: 70.5 %
+[166,  3196] loss: 0.238, epoch time: 14.354
+Dev: loss: 1.547, acc: 70.6 %
+[167,  3196] loss: 0.236, epoch time: 14.347
+Dev: loss: 1.557, acc: 69.8 %
+[168,  3196] loss: 0.235, epoch time: 14.399
+Dev: loss: 1.616, acc: 69.5 %
+[169,  3196] loss: 0.234, epoch time: 14.281
+Dev: loss: 1.555, acc: 70.4 %
+[170,  3196] loss: 0.232, epoch time: 14.325
+Dev: loss: 1.568, acc: 69.9 %
+[171,  3196] loss: 0.231, epoch time: 14.367
+Dev: loss: 1.555, acc: 70.7 %
+[172,  3196] loss: 0.229, epoch time: 14.353
+Dev: loss: 1.634, acc: 70.0 %
+[173,  3196] loss: 0.228, epoch time: 14.376
+Dev: loss: 1.618, acc: 69.6 %
+[174,  3196] loss: 0.226, epoch time: 14.362
+Dev: loss: 1.585, acc: 70.7 %
+[175,  3196] loss: 0.225, epoch time: 14.398
+Dev: loss: 1.651, acc: 69.4 %
+[176,  3196] loss: 0.224, epoch time: 14.387
+Dev: loss: 1.645, acc: 70.2 %
+[177,  3196] loss: 0.222, epoch time: 14.326
+Dev: loss: 1.626, acc: 70.4 %
+[178,  3196] loss: 0.220, epoch time: 14.351
+Dev: loss: 1.583, acc: 70.6 %
+[179,  3196] loss: 0.219, epoch time: 14.365
+Dev: loss: 1.613, acc: 70.5 %
+[180,  3196] loss: 0.217, epoch time: 14.355
+Dev: loss: 1.641, acc: 70.6 %
+[181,  3196] loss: 0.216, epoch time: 14.359
+Dev: loss: 1.749, acc: 69.3 %
+[182,  3196] loss: 0.214, epoch time: 14.361
+Dev: loss: 1.681, acc: 70.2 %
+[183,  3196] loss: 0.214, epoch time: 14.361
+Dev: loss: 1.735, acc: 69.5 %
+[184,  3196] loss: 0.212, epoch time: 14.410
+Dev: loss: 1.730, acc: 69.5 %
+[185,  3196] loss: 0.211, epoch time: 14.376
+Dev: loss: 1.709, acc: 70.2 %
+[186,  3196] loss: 0.209, epoch time: 14.360
+Dev: loss: 1.756, acc: 69.6 %
+[187,  3196] loss: 0.208, epoch time: 14.378
+Dev: loss: 1.786, acc: 69.9 %
+[188,  3196] loss: 0.207, epoch time: 14.350
+Dev: loss: 1.731, acc: 70.0 %
+[189,  3196] loss: 0.205, epoch time: 14.369
+Dev: loss: 1.703, acc: 70.5 %
+[190,  3196] loss: 0.204, epoch time: 14.402
+Dev: loss: 1.735, acc: 70.1 %
+[191,  3196] loss: 0.202, epoch time: 14.362
+Dev: loss: 1.796, acc: 69.6 %
+[192,  3196] loss: 0.201, epoch time: 14.364
+Dev: loss: 1.773, acc: 69.9 %
+[193,  3196] loss: 0.200, epoch time: 14.390
+Dev: loss: 1.758, acc: 70.1 %
+[194,  3196] loss: 0.198, epoch time: 14.375
+Dev: loss: 1.803, acc: 70.2 %
+[195,  3196] loss: 0.197, epoch time: 14.391
+Dev: loss: 1.869, acc: 69.1 %
+[196,  3196] loss: 0.196, epoch time: 14.476
+Dev: loss: 1.879, acc: 69.4 %
+[197,  3196] loss: 0.194, epoch time: 14.407
+Dev: loss: 1.850, acc: 69.8 %
+[198,  3196] loss: 0.192, epoch time: 14.357
+Dev: loss: 1.844, acc: 69.7 %
+[199,  3196] loss: 0.192, epoch time: 14.393
+Dev: loss: 1.834, acc: 70.0 %
+[200,  3196] loss: 0.190, epoch time: 14.409
+Dev: loss: 1.868, acc: 69.6 %
+[201,  3196] loss: 0.189, epoch time: 14.358
+Dev: loss: 1.849, acc: 69.9 %
+[202,  3196] loss: 0.188, epoch time: 14.373
+Dev: loss: 1.887, acc: 69.6 %
+[203,  3196] loss: 0.187, epoch time: 14.430
+Dev: loss: 1.961, acc: 69.0 %
+[204,  3196] loss: 0.185, epoch time: 14.353
+Dev: loss: 1.889, acc: 69.8 %
+[205,  3196] loss: 0.184, epoch time: 14.388
+Dev: loss: 1.932, acc: 69.8 %
+[206,  3196] loss: 0.183, epoch time: 14.391
+Dev: loss: 1.997, acc: 69.7 %
+[207,  3196] loss: 0.181, epoch time: 14.402
+Dev: loss: 1.985, acc: 69.1 %
+[208,  3196] loss: 0.180, epoch time: 14.682
+Dev: loss: 1.965, acc: 69.7 %
+[209,  3196] loss: 0.179, epoch time: 14.729
+Dev: loss: 1.958, acc: 69.2 %
+[210,  3196] loss: 0.178, epoch time: 14.661
+Dev: loss: 2.016, acc: 68.9 %
+[211,  3196] loss: 0.177, epoch time: 14.680
+Dev: loss: 2.060, acc: 69.3 %
+[212,  3196] loss: 0.175, epoch time: 14.208
+Dev: loss: 2.031, acc: 69.3 %
+[213,  3196] loss: 0.174, epoch time: 13.688
+Dev: loss: 2.064, acc: 68.8 %
+[214,  3196] loss: 0.173, epoch time: 13.675
+Dev: loss: 2.166, acc: 68.1 %
+[215,  3196] loss: 0.172, epoch time: 13.592
+Dev: loss: 1.994, acc: 69.3 %
+[216,  3196] loss: 0.171, epoch time: 13.632
+Dev: loss: 2.070, acc: 68.5 %
+[217,  3196] loss: 0.169, epoch time: 13.646
+Dev: loss: 2.107, acc: 68.9 %
+[218,  3196] loss: 0.168, epoch time: 13.633
+Dev: loss: 2.139, acc: 68.5 %
+[219,  3196] loss: 0.167, epoch time: 13.648
+Dev: loss: 2.043, acc: 69.8 %
+[220,  3196] loss: 0.166, epoch time: 13.755
+Dev: loss: 2.157, acc: 69.2 %
+[221,  3196] loss: 0.164, epoch time: 13.840
+Dev: loss: 2.240, acc: 67.9 %
+[222,  3196] loss: 0.163, epoch time: 14.032
+Dev: loss: 2.155, acc: 69.2 %
+[223,  3196] loss: 0.162, epoch time: 13.841
+Dev: loss: 2.098, acc: 69.3 %
+[224,  3196] loss: 0.161, epoch time: 13.800
+Dev: loss: 2.196, acc: 68.4 %
+[225,  3196] loss: 0.160, epoch time: 13.721
+Dev: loss: 2.102, acc: 69.3 %
+[226,  3196] loss: 0.159, epoch time: 13.756
+Dev: loss: 2.085, acc: 69.8 %
+[227,  3196] loss: 0.158, epoch time: 13.863
+Dev: loss: 2.299, acc: 68.7 %
+[228,  3196] loss: 0.157, epoch time: 13.813
+Dev: loss: 2.173, acc: 69.0 %
+[229,  3196] loss: 0.155, epoch time: 15.246
+Dev: loss: 2.246, acc: 68.5 %
+[230,  3196] loss: 0.154, epoch time: 13.903
+Dev: loss: 2.151, acc: 69.6 %
