@@ -14,6 +14,7 @@ class PlotBatches(object):
         train_loss = np.array([i for i in self.train_history['train_loss']])
         test_loss = np.array([i for i in self.train_history['test_loss']])
         test_acc = np.array([i for i in self.train_history['test_acc']])
+        test_acc /= 100.0
 
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -33,10 +34,8 @@ class PlotBatches(object):
         # Annotate epoches points
         last_reported_epoch = None
         for i, y_val in enumerate(test_acc):
-            epoch = (i+1) / updates_per_epoch
-            if epoch != last_reported_epoch and epoch > 0:
-                ax.annotate("%.3f" % test_acc[i], xy=(epoch*updates_per_epoch,test_acc[i]), textcoords='data')
-                last_reported_epoch = epoch
+            epoch = i
+            ax.annotate("%.3f" % y_val, xy=(epoch*updates_per_epoch,y_val), textcoords='data')
 
         #plt.legend()
         #plt.draw()
@@ -59,7 +58,7 @@ def plot(epoches_info):
         epoch_num, train_loss, train_acc, dev_loss, dev_acc = epoch
         graph.update(train_loss, dev_loss, dev_acc)
 
-    graph.show(len(epoch_info))
+    graph.show(1)
 
 
 if __name__ == '__main__':
