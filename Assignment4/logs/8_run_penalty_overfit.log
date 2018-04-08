@@ -1,0 +1,120 @@
+increase sent size when overfitting.
+same results as entire run +-, but takes less time.
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:54: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:60: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+[1,  3200] loss: 0.963, epoch time: 10.072
+Dev: loss: 0.959, acc: 58.1 %
+[2,  3200] loss: 0.827, epoch time: 8.842
+Dev: loss: 0.957, acc: 61.8 %
+Possible overfitting: max_sent_len++
+[3,  4747] loss: 0.749, epoch time: 13.041
+Dev: loss: 0.831, acc: 67.4 %
+[4,  4747] loss: 0.683, epoch time: 13.057
+Dev: loss: 0.785, acc: 70.5 %
+[5,  4747] loss: 0.634, epoch time: 13.147
+Dev: loss: 0.777, acc: 71.9 %
+[6,  4747] loss: 0.599, epoch time: 13.088
+Dev: loss: 0.739, acc: 73.8 %
+[7,  4747] loss: 0.571, epoch time: 13.339
+Dev: loss: 0.739, acc: 73.7 %
+Possible overfitting: max_sent_len++
+[8,  6372] loss: 0.563, epoch time: 17.612
+Dev: loss: 0.683, acc: 76.0 %
+[9,  6372] loss: 0.541, epoch time: 17.580
+Dev: loss: 0.672, acc: 76.1 %
+[10,  6372] loss: 0.522, epoch time: 17.503
+Dev: loss: 0.680, acc: 76.3 %
+Possible overfitting: max_sent_len++
+[11,  7940] loss: 0.521, epoch time: 21.807
+Dev: loss: 0.645, acc: 77.3 %
+[12,  7940] loss: 0.505, epoch time: 22.003
+Dev: loss: 0.635, acc: 77.7 %
+[13,  7940] loss: 0.491, epoch time: 21.896
+Dev: loss: 0.629, acc: 77.9 %
+[14,  7940] loss: 0.479, epoch time: 21.882
+Dev: loss: 0.622, acc: 78.4 %
+[15,  7940] loss: 0.469, epoch time: 21.907
+Dev: loss: 0.609, acc: 78.3 %
+[16,  7940] loss: 0.459, epoch time: 21.884
+Dev: loss: 0.605, acc: 78.5 %
+[17,  7940] loss: 0.450, epoch time: 21.836
+Dev: loss: 0.620, acc: 78.7 %
+Possible overfitting: max_sent_len++
+[18,  9350] loss: 0.459, epoch time: 25.757
+Dev: loss: 0.592, acc: 79.1 %
+[19,  9350] loss: 0.449, epoch time: 25.701
+Dev: loss: 0.592, acc: 78.9 %
+Possible overfitting: max_sent_len++
+[20, 10584] loss: 0.454, epoch time: 29.304
+Dev: loss: 0.573, acc: 79.4 %
+[21, 10584] loss: 0.445, epoch time: 29.140
+Dev: loss: 0.584, acc: 79.2 %
+Possible overfitting: max_sent_len++
+[22, 11665] loss: 0.448, epoch time: 32.036
+Dev: loss: 0.585, acc: 79.4 %
+Possible overfitting: max_sent_len++
+[23, 12564] loss: 0.448, epoch time: 34.663
+Dev: loss: 0.568, acc: 79.5 %
+[24, 12564] loss: 0.440, epoch time: 34.799
+Dev: loss: 0.545, acc: 79.9 %
+[25, 12564] loss: 0.433, epoch time: 34.926
+Dev: loss: 0.545, acc: 80.1 %
+Possible overfitting: max_sent_len++
+[26, 13314] loss: 0.434, epoch time: 37.050
+Dev: loss: 0.533, acc: 80.5 %
+[27, 13314] loss: 0.428, epoch time: 36.934
+Dev: loss: 0.534, acc: 80.5 %
+Possible overfitting: max_sent_len++
+[28, 13965] loss: 0.428, epoch time: 38.937
+Dev: loss: 0.530, acc: 80.5 %
+[29, 13965] loss: 0.422, epoch time: 38.912
+Dev: loss: 0.543, acc: 80.4 %
+Possible overfitting: max_sent_len++
+[30, 14552] loss: 0.422, epoch time: 40.654
+Dev: loss: 0.530, acc: 80.7 %
+[31, 14552] loss: 0.417, epoch time: 40.637
+Dev: loss: 0.531, acc: 80.5 %
+Possible overfitting: max_sent_len++
+[32, 15070] loss: 0.416, epoch time: 42.000
+Dev: loss: 0.520, acc: 80.9 %
+[33, 15070] loss: 0.411, epoch time: 42.381
+Dev: loss: 0.523, acc: 81.1 %
+Possible overfitting: max_sent_len++
+[34, 15509] loss: 0.410, epoch time: 43.182
+Dev: loss: 0.512, acc: 81.1 %
+[35, 15509] loss: 0.406, epoch time: 43.390
+Dev: loss: 0.523, acc: 80.9 %
+Possible overfitting: max_sent_len++
+[36, 15892] loss: 0.405, epoch time: 44.243
+Dev: loss: 0.518, acc: 81.1 %
+[37, 15892] loss: 0.400, epoch time: 44.446
+Dev: loss: 0.516, acc: 81.3 %
+[38, 15892] loss: 0.396, epoch time: 44.712
+Dev: loss: 0.524, acc: 81.0 %
+Possible overfitting: max_sent_len++
+[39, 16188] loss: 0.396, epoch time: 45.372
+Dev: loss: 0.512, acc: 81.4 %
+[40, 16188] loss: 0.392, epoch time: 45.347
+Dev: loss: 0.514, acc: 81.3 %
+Possible overfitting: max_sent_len++
+[41, 16427] loss: 0.390, epoch time: 45.794
+Dev: loss: 0.519, acc: 81.4 %
+Possible overfitting: max_sent_len++
+[42, 16640] loss: 0.388, epoch time: 46.890
+Dev: loss: 0.513, acc: 81.1 %
+[43, 16640] loss: 0.385, epoch time: 47.592
+Dev: loss: 0.523, acc: 80.9 %
+Possible overfitting: max_sent_len++
+[44, 16820] loss: 0.383, epoch time: 46.659
+Dev: loss: 0.512, acc: 81.0 %
+[45, 16820] loss: 0.380, epoch time: 47.085
+Dev: loss: 0.518, acc: 81.2 %
+Possible overfitting: max_sent_len++
+[46, 16970] loss: 0.378, epoch time: 47.084
+Dev: loss: 0.515, acc: 80.9 %

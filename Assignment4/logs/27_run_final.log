@@ -1,0 +1,59 @@
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py ../out/entail-train.hdf5 ../out/entail-val.hdf5 ../out/glove.hdf5
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+==============================
+Begin training of model
+816603 parameters
+==============================
+[1, 11647] epoch time: 80.215
+train_loss: 0.815, train_acc: 66.555
+dev_loss: 0.885, dev_acc: 67.371
+[2, 11647] epoch time: 84.789
+train_loss: 0.597, train_acc: 76.002
+dev_loss: 0.604, dev_acc: 76.954
+[3, 11647] epoch time: 85.971
+train_loss: 0.554, train_acc: 78.085
+dev_loss: 0.569, dev_acc: 78.803
+[4, 11647] epoch time: 83.651
+train_loss: 0.529, train_acc: 79.213
+dev_loss: 0.554, dev_acc: 79.555
+[5, 11647] epoch time: 83.537
+train_loss: 0.508, train_acc: 80.243
+dev_loss: 0.524, dev_acc: 80.459
+[6, 11647] epoch time: 83.497
+train_loss: 0.499, train_acc: 80.640
+dev_loss: 0.537, dev_acc: 80.165
+[7, 11647] epoch time: 83.616
+train_loss: 0.483, train_acc: 81.422
+dev_loss: 0.514, dev_acc: 81.049
+[8, 11647] epoch time: 83.850
+train_loss: 0.477, train_acc: 81.903
+dev_loss: 0.528, dev_acc: 80.825
+[9, 11647] epoch time: 84.082
+train_loss: 0.475, train_acc: 81.990
+dev_loss: 0.525, dev_acc: 81.171
+[10, 11647] epoch time: 83.539
+train_loss: 0.459, train_acc: 82.646
+dev_loss: 0.520, dev_acc: 81.343
+[11, 11647] epoch time: 84.394
+train_loss: 0.449, train_acc: 83.170
+dev_loss: 0.521, dev_acc: 81.394
+[12, 11647] epoch time: 85.185
+train_loss: 0.448, train_acc: 83.286
+dev_loss: 0.524, dev_acc: 81.414
+[13, 11647] epoch time: 85.500
+train_loss: 0.440, train_acc: 83.727
+dev_loss: 0.530, dev_acc: 81.577
+[14, 11647] epoch time: 85.995
+train_loss: 0.441, train_acc: 83.856
+dev_loss: 0.549, dev_acc: 80.988
+[15, 11647] epoch time: 85.508
+train_loss: 0.433, train_acc: 84.156
+dev_loss: 0.536, dev_acc: 81.303
+[16, 11647] epoch time: 85.603
+train_loss: 0.427, train_acc: 84.478
+dev_loss: 0.544, dev_acc: 80.988
+[17, 11647] epoch time: 85.984
+train_loss: 0.423, train_acc: 84.738
+dev_loss: 0.545, dev_acc: 81.374
+

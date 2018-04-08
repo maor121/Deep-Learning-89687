@@ -1,0 +1,29 @@
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+[1, 10566] loss: 0.858, epoch time: 69.645
+Dev: loss: 0.993, acc: 65.8 %
+[2, 10566] loss: 0.646, epoch time: 85.345
+Dev: loss: 0.627, acc: 75.7 %
+[3, 10566] loss: 0.573, epoch time: 85.309
+Dev: loss: 0.589, acc: 77.4 %
+[4, 10566] loss: 0.534, epoch time: 85.232
+Dev: loss: 0.559, acc: 79.2 %
+[5, 10566] loss: 0.506, epoch time: 85.248
+Dev: loss: 0.555, acc: 79.5 %
+[6, 10566] loss: 0.486, epoch time: 85.274
+Dev: loss: 0.547, acc: 79.8 %
+[7, 10566] loss: 0.469, epoch time: 84.977
+Dev: loss: 0.532, acc: 80.6 %
+[8, 10566] loss: 0.455, epoch time: 85.077
+Dev: loss: 0.547, acc: 81.1 %
+[9, 10566] loss: 0.442, epoch time: 85.087
+Dev: loss: 0.530, acc: 81.0 %
+[10, 10566] loss: 0.430, epoch time: 85.059
+Dev: loss: 0.549, acc: 81.3 %
+[11, 10566] loss: 0.419, epoch time: 86.521
+Dev: loss: 0.533, acc: 81.0 %
+[12, 10566] loss: 0.408, epoch time: 85.967
+Dev: loss: 0.543, acc: 81.0 %
+[13, 10566] loss: 0.398, epoch time: 86.079
+Dev: loss: 0.585, acc: 80.2 %

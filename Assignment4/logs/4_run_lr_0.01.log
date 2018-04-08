@@ -1,0 +1,155 @@
+change lr=0.05->0.01
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:54: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:60: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:93: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  log_prob = self.log_prob(h)
+epoch time: 57.505
+[1, 18183] loss: 0.790
+Accuracy of the network on the 9841 test words: 67 %
+epoch time: 50.930
+[2, 18183] loss: 0.644
+Accuracy of the network on the 9841 test words: 71 %
+epoch time: 51.049
+[3, 18183] loss: 0.592
+Accuracy of the network on the 9841 test words: 72 %
+epoch time: 51.197
+[4, 18183] loss: 0.561
+Accuracy of the network on the 9841 test words: 73 %
+epoch time: 50.974
+[5, 18183] loss: 0.539
+Accuracy of the network on the 9841 test words: 74 %
+epoch time: 50.816
+[6, 18183] loss: 0.522
+Accuracy of the network on the 9841 test words: 76 %
+epoch time: 50.751
+[7, 18183] loss: 0.507
+Accuracy of the network on the 9841 test words: 76 %
+epoch time: 50.806
+[8, 18183] loss: 0.495
+Accuracy of the network on the 9841 test words: 77 %
+epoch time: 50.857
+[9, 18183] loss: 0.485
+Accuracy of the network on the 9841 test words: 77 %
+epoch time: 50.763
+[10, 18183] loss: 0.476
+Accuracy of the network on the 9841 test words: 78 %
+epoch time: 51.046
+[11, 18183] loss: 0.467
+Accuracy of the network on the 9841 test words: 78 %
+epoch time: 50.629
+[12, 18183] loss: 0.460
+Accuracy of the network on the 9841 test words: 79 %
+epoch time: 50.639
+[13, 18183] loss: 0.453
+Accuracy of the network on the 9841 test words: 79 %
+epoch time: 50.531
+[14, 18183] loss: 0.446
+Accuracy of the network on the 9841 test words: 79 %
+epoch time: 50.777
+[15, 18183] loss: 0.441
+Accuracy of the network on the 9841 test words: 78 %
+epoch time: 50.597
+[16, 18183] loss: 0.435
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.610
+[17, 18183] loss: 0.429
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.751
+[18, 18183] loss: 0.423
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.670
+[19, 18183] loss: 0.420
+Accuracy of the network on the 9841 test words: 77 %
+epoch time: 50.713
+[20, 18183] loss: 0.416
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.674
+[21, 18183] loss: 0.410
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.553
+[22, 18183] loss: 0.405
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.646
+[23, 18183] loss: 0.401
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.641
+[24, 18183] loss: 0.397
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.681
+[25, 18183] loss: 0.393
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 51.408
+[26, 18183] loss: 0.390
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 51.124
+[27, 18183] loss: 0.386
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.788
+[28, 18183] loss: 0.383
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.559
+[29, 18183] loss: 0.379
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.721
+[30, 18183] loss: 0.376
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.717
+[31, 18183] loss: 0.373
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.442
+[32, 18183] loss: 0.370
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.988
+[33, 18183] loss: 0.367
+Accuracy of the network on the 9841 test words: 78 %
+epoch time: 50.572
+[34, 18183] loss: 0.364
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.510
+[35, 18183] loss: 0.360
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.691
+[36, 18183] loss: 0.357
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.504
+[37, 18183] loss: 0.354
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.669
+[38, 18183] loss: 0.352
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.588
+[39, 18183] loss: 0.349
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.590
+[40, 18183] loss: 0.346
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.766
+[41, 18183] loss: 0.343
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.885
+[42, 18183] loss: 0.341
+Accuracy of the network on the 9841 test words: 80 %
+epoch time: 50.699
+[43, 18183] loss: 0.339
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.611
+[44, 18183] loss: 0.336
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.617
+[45, 18183] loss: 0.333
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.548
+[46, 18183] loss: 0.331
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.765
+[47, 18183] loss: 0.328
+Accuracy of the network on the 9841 test words: 81 %
+epoch time: 50.593
+[48, 18183] loss: 0.326
+Accuracy of the network on the 9841 test words: 81 %

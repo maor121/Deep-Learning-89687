@@ -1,0 +1,126 @@
+added back weight decay
+train on data only until length 10
+
+(overfitting)
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:54: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:60: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:93: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  log_prob = self.log_prob(h)
+[1,  3200] loss: 0.925, epoch time: 9.917
+Accuracy of the network on the 9841 test words: 57 %
+[2,  3200] loss: 0.815, epoch time: 8.703
+Accuracy of the network on the 9841 test words: 62 %
+[3,  3200] loss: 0.755, epoch time: 8.723
+Accuracy of the network on the 9841 test words: 66 %
+[4,  3200] loss: 0.696, epoch time: 8.715
+Accuracy of the network on the 9841 test words: 68 %
+[5,  3200] loss: 0.648, epoch time: 8.707
+Accuracy of the network on the 9841 test words: 69 %
+[6,  3200] loss: 0.615, epoch time: 8.791
+Accuracy of the network on the 9841 test words: 70 %
+[7,  3200] loss: 0.589, epoch time: 8.766
+Accuracy of the network on the 9841 test words: 70 %
+[8,  3200] loss: 0.566, epoch time: 8.776
+Accuracy of the network on the 9841 test words: 71 %
+[9,  3200] loss: 0.546, epoch time: 8.830
+Accuracy of the network on the 9841 test words: 71 %
+[10,  3200] loss: 0.528, epoch time: 8.789
+Accuracy of the network on the 9841 test words: 71 %
+[11,  3200] loss: 0.511, epoch time: 8.807
+Accuracy of the network on the 9841 test words: 71 %
+[12,  3200] loss: 0.495, epoch time: 8.705
+Accuracy of the network on the 9841 test words: 71 %
+[13,  3200] loss: 0.480, epoch time: 8.702
+Accuracy of the network on the 9841 test words: 71 %
+[14,  3200] loss: 0.464, epoch time: 8.712
+Accuracy of the network on the 9841 test words: 71 %
+[15,  3200] loss: 0.450, epoch time: 8.769
+Accuracy of the network on the 9841 test words: 71 %
+[16,  3200] loss: 0.435, epoch time: 8.688
+Accuracy of the network on the 9841 test words: 71 %
+[17,  3200] loss: 0.421, epoch time: 8.790
+Accuracy of the network on the 9841 test words: 71 %
+[18,  3200] loss: 0.407, epoch time: 8.821
+Accuracy of the network on the 9841 test words: 71 %
+[19,  3200] loss: 0.394, epoch time: 8.783
+Accuracy of the network on the 9841 test words: 71 %
+[20,  3200] loss: 0.380, epoch time: 8.742
+Accuracy of the network on the 9841 test words: 71 %
+[21,  3200] loss: 0.367, epoch time: 8.784
+Accuracy of the network on the 9841 test words: 71 %
+[22,  3200] loss: 0.354, epoch time: 8.770
+Accuracy of the network on the 9841 test words: 71 %
+[23,  3200] loss: 0.341, epoch time: 8.794
+Accuracy of the network on the 9841 test words: 70 %
+[24,  3200] loss: 0.328, epoch time: 8.687
+Accuracy of the network on the 9841 test words: 70 %
+[25,  3200] loss: 0.315, epoch time: 8.714
+Accuracy of the network on the 9841 test words: 70 %
+[26,  3200] loss: 0.302, epoch time: 8.749
+Accuracy of the network on the 9841 test words: 70 %
+[27,  3200] loss: 0.290, epoch time: 8.787
+Accuracy of the network on the 9841 test words: 70 %
+[28,  3200] loss: 0.278, epoch time: 8.828
+Accuracy of the network on the 9841 test words: 70 %
+[29,  3200] loss: 0.266, epoch time: 8.760
+Accuracy of the network on the 9841 test words: 70 %
+[30,  3200] loss: 0.255, epoch time: 8.745
+Accuracy of the network on the 9841 test words: 69 %
+[31,  3200] loss: 0.243, epoch time: 8.727
+Accuracy of the network on the 9841 test words: 69 %
+[32,  3200] loss: 0.233, epoch time: 8.759
+Accuracy of the network on the 9841 test words: 69 %
+[33,  3200] loss: 0.222, epoch time: 8.795
+Accuracy of the network on the 9841 test words: 69 %
+[34,  3200] loss: 0.213, epoch time: 8.730
+Accuracy of the network on the 9841 test words: 69 %
+[35,  3200] loss: 0.203, epoch time: 8.736
+Accuracy of the network on the 9841 test words: 69 %
+[36,  3200] loss: 0.195, epoch time: 8.803
+Accuracy of the network on the 9841 test words: 68 %
+[37,  3200] loss: 0.187, epoch time: 8.819
+Accuracy of the network on the 9841 test words: 68 %
+[38,  3200] loss: 0.180, epoch time: 8.765
+Accuracy of the network on the 9841 test words: 68 %
+[39,  3200] loss: 0.172, epoch time: 8.799
+Accuracy of the network on the 9841 test words: 68 %
+[40,  3200] loss: 0.165, epoch time: 8.663
+Accuracy of the network on the 9841 test words: 68 %
+[41,  3200] loss: 0.159, epoch time: 8.738
+Accuracy of the network on the 9841 test words: 68 %
+[42,  3200] loss: 0.153, epoch time: 8.714
+Accuracy of the network on the 9841 test words: 68 %
+[43,  3200] loss: 0.147, epoch time: 8.767
+Accuracy of the network on the 9841 test words: 68 %
+[44,  3200] loss: 0.141, epoch time: 8.818
+Accuracy of the network on the 9841 test words: 68 %
+[45,  3200] loss: 0.137, epoch time: 8.699
+Accuracy of the network on the 9841 test words: 68 %
+[46,  3200] loss: 0.134, epoch time: 8.738
+Accuracy of the network on the 9841 test words: 68 %
+[47,  3200] loss: 0.130, epoch time: 8.748
+Accuracy of the network on the 9841 test words: 68 %
+[48,  3200] loss: 0.124, epoch time: 8.850
+Accuracy of the network on the 9841 test words: 67 %
+[49,  3200] loss: 0.118, epoch time: 8.855
+Accuracy of the network on the 9841 test words: 68 %
+[50,  3200] loss: 0.111, epoch time: 8.733
+Accuracy of the network on the 9841 test words: 68 %
+[51,  3200] loss: 0.105, epoch time: 8.785
+Accuracy of the network on the 9841 test words: 68 %
+[52,  3200] loss: 0.100, epoch time: 8.691
+Accuracy of the network on the 9841 test words: 67 %
+[53,  3200] loss: 0.096, epoch time: 8.818
+Accuracy of the network on the 9841 test words: 67 %
+[54,  3200] loss: 0.093, epoch time: 8.765
+Accuracy of the network on the 9841 test words: 68 %
+[55,  3200] loss: 0.093, epoch time: 8.765
+Accuracy of the network on the 9841 test words: 68 %
+[56,  3200] loss: 0.091, epoch time: 8.731
+Accuracy of the network on the 9841 test words: 68 %

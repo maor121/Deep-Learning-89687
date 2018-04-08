@@ -1,0 +1,57 @@
+weight decay=5e-5
+learning rate=0.001 -> 0.05
+
+/home/maor16-04/Devl/git/deep-article-github/venv/bin/python /home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/train.py
+/home/maor16-04/Devl/git/deep-article-github/venv/local/lib/python2.7/site-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:54: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob1 = F.softmax(score1.view(-1, targets_sent_len)).view(-1, source_sent_len, targets_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:60: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  prob2 = F.softmax(score2.view(-1, source_sent_len)).view(-1, targets_sent_len, source_sent_len)
+/home/maor16-04/Devl/git/Deep-Learning-89687/Assignment4/code/model.py:93: UserWarning: Implicit dimension choice for log_softmax has been deprecated. Change the call to include dim=X as an argument.
+  log_prob = self.log_prob(h)
+epoch time: 57.399
+[1, 18183] loss: 1.382
+Accuracy of the network on the 9841 test words: 32 %
+epoch time: 50.688
+[2, 18183] loss: 1.028
+Accuracy of the network on the 9841 test words: 34 %
+epoch time: 50.990
+[3, 18183] loss: 0.937
+Accuracy of the network on the 9841 test words: 47 %
+epoch time: 50.675
+[4, 18183] loss: 0.893
+Accuracy of the network on the 9841 test words: 50 %
+epoch time: 50.715
+[5, 18183] loss: 0.859
+Accuracy of the network on the 9841 test words: 54 %
+epoch time: 50.542
+[6, 18183] loss: 0.837
+Accuracy of the network on the 9841 test words: 57 %
+epoch time: 50.325
+[7, 18183] loss: 0.816
+Accuracy of the network on the 9841 test words: 55 %
+epoch time: 50.205
+[8, 18183] loss: 0.800
+Accuracy of the network on the 9841 test words: 55 %
+epoch time: 50.020
+[9, 18183] loss: 0.785
+Accuracy of the network on the 9841 test words: 60 %
+epoch time: 50.058
+[10, 18183] loss: 0.774
+Accuracy of the network on the 9841 test words: 58 %
+epoch time: 50.220
+[11, 18183] loss: 0.765
+Accuracy of the network on the 9841 test words: 60 %
+epoch time: 50.412
+[12, 18183] loss: 0.755
+Accuracy of the network on the 9841 test words: 60 %
+epoch time: 49.966
+[13, 18183] loss: 0.746
+Accuracy of the network on the 9841 test words: 60 %
+epoch time: 50.110
+[14, 18183] loss: 0.738
+Accuracy of the network on the 9841 test words: 62 %
+epoch time: 50.437
+[15, 18183] loss: 0.730
+Accuracy of the network on the 9841 test words: 61 %
