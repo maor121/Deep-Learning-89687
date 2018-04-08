@@ -24,7 +24,7 @@ Challenges included: batching for sequences (non-uniform length).
 
 Assignment 4
 ------------
-**Implement an SLNI  paper - An exercise in Attention**<br/>
+**Implement an SNLI  paper - An exercise in Attention**<br/>
 NLI (Natural Language Inference) is a problem in NLP in which given two sentences, the computer needs to know whether they: (a) contradict each other (b) neutral (c) they agree.<br/>
 The SNLI challenge is an NLI challenge managed by Stanford Univesity, and recent papers managed to get 89% accuracy (2018).<br/>
 The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using a relatively intuitive approach: <br/><br/>
