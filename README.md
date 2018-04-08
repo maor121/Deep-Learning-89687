@@ -33,8 +33,7 @@ The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using 
 2. Every pair of sentences are softly aligned to one another. Meaning every word from sentence 1 is softly aligned to all the words in sentence 2. Then you concat: every word from sentence 1 with subphrase from sentence 2.
 3. the concatination of word and subphrase is passed to a MLP which determines weather they "agree", "contradict", or "neutral" with one another.
 4. The result is summed, thus you "count" how many parts in the sentences "agree", "contradict" or are "neutral" with one another. And the result is this passed through a softmax to get the discrete class.
-
-<br/><br/>
+<br/>
 **The Pros of this approach:**
 - Intuitive - much simpler and cleaner then other approches.
 - Quick to run - this is an Attention without LSTM. LSTMs are knowns for their long learning times, and with how much data they need.
