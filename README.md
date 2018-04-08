@@ -38,5 +38,5 @@ The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using 
 
 **The Pros of this approach:**
 - Intuitive - much simpler and cleaner then other approches.
-- Quick to run - this is an Attention without LSTM. LSTMs are knowns for their long learning times, and with how much data they need.
+- Quick to run - this is an Attention without LSTM. LSTMs are knowns for their long run times: limited parallelization & need alot of data.
 - High accuracy - 86% (paper), 81% (My own)
