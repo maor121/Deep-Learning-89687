@@ -27,13 +27,15 @@ Assignment 4
 **Implement an SLNI  paper - An exercise in Attention**<br/>
 NLI (Natural Language Inference) is a problem in NLP in which given two sentences, the computer needs to know whether they: (a) contradict each other (b) neutral (c) they agree.<br/>
 The SNLI challenge is an NLI challenge managed by Stanford Univesity, and recent papers managed to get 89% accuracy (2018).<br/>
-The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using a relatively intuitive approach: <br/>
+The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using a relatively intuitive approach: <br/><br/>
 **High level description:**
 1. First, each sentence is converted to it's word embeddings (Glove pretrained).
 2. Every pair of sentences are softly aligned to one another. Meaning every word from sentence 1 is softly aligned to all the words in sentence 2. Then you concat: every word from sentence 1 with subphrase from sentence 2.
 3. the concatination of word and subphrase is passed to a MLP which determines weather they "agree", "contradict", or "neutral" with one another.
-4. The result is summed, thus you "count" how many parts in the sentences "agree", "contradict" or are "neutral" with one another. And the result is this passed through a softmax to get the discrete class.<br/>
+4. The result is summed, thus you "count" how many parts in the sentences "agree", "contradict" or are "neutral" with one another. And the result is this passed through a softmax to get the discrete class.
+
+<br/><br/>
 **The Pros of this approach:**
-1. Intuitive - much simpler and cleaner then other approches.
-2. Quick to run - this is an Attention without LSTM. LSTMs are knowns for their long learning times, and with how much data they need.
-3. High accuracy - 86% (paper), 81% (My own)
+- Intuitive - much simpler and cleaner then other approches.
+- Quick to run - this is an Attention without LSTM. LSTMs are knowns for their long learning times, and with how much data they need.
+- High accuracy - 86% (paper), 81% (My own)
