@@ -27,7 +27,7 @@ Assignment 4
 **Implement an SLNI  paper - An exercise in Attention**<br/>
 NLI (Natural Language Inference) is a problem in NLP in which given two sentences, the computer needs to know whether they: (a) contradict each other (b) neutral (c) they agree.<br/>
 The SNLI challenge is an NLI challenge managed by Stanford Univesity, and recent papers managed to get 89% accuracy (2018).<br/>
-The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using a relatively intuitive approach:
+The paper I chose (https://arxiv.org/abs/1606.01933), solved this problem using a relatively intuitive approach: <br/>
 **High level description:**
 1. First, each sentence is converted to it's word embeddings (Glove pretrained).
 2. Every pair of sentences are softly aligned to one another. Meaning every word from sentence 1 is softly aligned to all the words in sentence 2. Then you concat: every word from sentence 1 with subphrase from sentence 2.
